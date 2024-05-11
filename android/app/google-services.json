@@ -1,0 +1,90 @@
+{
+  "project_info": {
+    "project_number": "497881747557",
+    "project_id": "petappdb-5f982",
+    "storage_bucket": "petappdb-5f982.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:497881747557:android:6e899edfc09e8319e0768c",
+        "android_client_info": {
+          "package_name": "com.example.dismov_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "497881747557-5pb0hsjmhnugn68u47o19vrkj44qu2cn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.dismov_app",
+            "certificate_hash": "acfd51bf7d4f32af3e32ab678ba40289415dbb37"
+          }
+        },
+        {
+          "client_id": "497881747557-poqva3mhr5fp6qgqafv7n38llnnkbd2l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDmbTDViDDRKkDgbL4bpsdtD4lRFSdcNCQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "497881747557-poqva3mhr5fp6qgqafv7n38llnnkbd2l.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "497881747557-3uuk8tvom7jsbjfk2f5a6qk2o3r99v04.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.dismovApp.RunnerTests"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:497881747557:android:d1bf1e3c431cfd19e0768c",
+        "android_client_info": {
+          "package_name": "com.example.pawtnerup_admin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "497881747557-poqva3mhr5fp6qgqafv7n38llnnkbd2l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDmbTDViDDRKkDgbL4bpsdtD4lRFSdcNCQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "497881747557-poqva3mhr5fp6qgqafv7n38llnnkbd2l.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "497881747557-3uuk8tvom7jsbjfk2f5a6qk2o3r99v04.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.dismovApp.RunnerTests"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
