@@ -1,11 +1,8 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:pawtnerup_admin/app/utils/data.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:pawtnerup_admin/shared/shared.dart';
 import 'package:pawtnerup_admin/config/config.dart';
 import 'package:pawtnerup_admin/shared/widgets/shelter_item.dart';
-import 'package:pawtnerup_admin/app/menu/screen/Pet/petprofile.dart';
 //Location
 import 'package:pawtnerup_admin/utils/location_utils.dart';
 import 'package:pawtnerup_admin/app/menu/screen/chat/chat.dart';

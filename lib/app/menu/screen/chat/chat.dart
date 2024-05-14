@@ -96,7 +96,7 @@ class ShelterDetailPage extends StatelessWidget {
                 const SizedBox(height: 20),
                 Row(
                   children: [
-                    Icon(Icons.location_on, color: Colors.grey),
+                    const Icon(Icons.location_on, color: Colors.grey),
                     const SizedBox(width: 5),
                     Text(
                       "Ubicación ${shelter['location']}",

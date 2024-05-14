@@ -129,12 +129,12 @@ class _RegisterFormState extends State<_RegisterForm> {
               icon: MdiIcons.fromString("account-multiple-plus"),
               onPressed: () async {
                 try {
-                  await LoginGoogleUtils()
+                  String? uid = await LoginGoogleUtils()
                       .createUserWithEmail(email.text, password.text);
                   if (FirebaseAuth.instance.currentUser != null) {
                     FirebaseAuth.instance.currentUser
                         ?.updateDisplayName(username.text);
-                    addPeople(username.text, email.text);
+                    addPeople(username.text, email.text, uid!);
 
                     if (context.mounted) {
                       context.go("/Root");

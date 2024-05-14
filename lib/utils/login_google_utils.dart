@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginGoogleUtils {
   //Create User With Email
-  Future<void> createUserWithEmail(emailAddress, password) async {
+  Future<String?> createUserWithEmail(emailAddress, password) async {
     try {
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailAddress,
@@ -20,6 +20,7 @@ class LoginGoogleUtils {
     } catch (e) {
       debugPrint(e as String?);
     }
+    return FirebaseAuth.instance.currentUser?.uid;
   }
 
   //LoginUser with email

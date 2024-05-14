@@ -1,13 +1,10 @@
 import 'package:pawtnerup_admin/config/config.dart';
-import 'package:pawtnerup_admin/shared/widgets/box_favorite.dart';
 import 'package:flutter/material.dart';
 import 'package:glassmorphism_ui/glassmorphism_ui.dart';
 import 'package:pawtnerup_admin/shared/widgets/pet_item_horizontal.dart';
 import 'package:pawtnerup_admin/app/utils/data.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:pawtnerup_admin/app/menu/screen/Pet/petprofile.dart';
-import 'package:go_router/go_router.dart';
-import 'package:path/path.dart';
 
 import 'custom_image.dart';
 

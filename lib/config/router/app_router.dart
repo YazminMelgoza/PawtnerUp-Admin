@@ -4,9 +4,7 @@ import 'package:pawtnerup_admin/app/menu/screen/menu_screen.dart';
 import 'package:pawtnerup_admin/app/menu/screen/root_menu.dart';
 import 'package:pawtnerup_admin/auth/screens/login_screen.dart';
 import 'package:pawtnerup_admin/auth/screens/register_screen.dart';
-import 'package:pawtnerup_admin/app/menu/screen/Pet/petprofile.dart';
 
-import 'package:pawtnerup_admin/app/menu/screen/Pet/petPage.dart';
 
 import 'package:go_router/go_router.dart';
 
