@@ -1,43 +1,69 @@
 class PetModel {
-  final String name;
-  final String breed;
-  final int age;
-  final String description;
-  final String image;
-  final bool isAdopted;
-  final String shelterId;
+  String name;
+  String type;
+  String sex;
+  int? ageInYears;
+  String size;
+  String breed;
+  List<String> features;
+  List<String> colors;
+  List<String> imageURLs;
+  String shelterId;
+  String adoptionStatus;
+  String? story;
+  int publishedAt;
 
   PetModel({
     required this.name,
+    required this.type,
+    required this.sex,
+    this.ageInYears,
+    required this.size,
     required this.breed,
-    required this.age,
-    required this.description,
-    required this.image,
-    required this.isAdopted,
+    required this.features,
+    required this.colors,
+    required this.imageURLs,
     required this.shelterId,
+    required this.adoptionStatus,
+    this.story,
+    required this.publishedAt,
   });
 
-  factory PetModel.fromJson(Map<String, dynamic> json) {
-    return PetModel(
-      name: json['name'] ?? '',
-      breed: json['breed'] ?? '',
-      age: json['age'] ?? 0,
-      description: json['description'] ?? '',
-      image: json['image'] ?? '',
-      isAdopted: json['isAdopted'] ?? false,
-      shelterId: json['shelterId'] ?? '',
-    );
-  }
-
-  Map<String, dynamic> toJson() {
+  // Método para convertir un objeto de mascota a un mapa
+  Map<String, dynamic> toMap() {
     return {
       'name': name,
+      'type': type,
+      'sex': sex,
+      'ageInYears': ageInYears,
+      'size': size,
       'breed': breed,
-      'age': age,
-      'description': description,
-      'image': image,
-      'isAdopted': isAdopted,
+      'features': features,
+      'colors': colors,
+      'imageURLs': imageURLs,
       'shelterId': shelterId,
+      'adoptionStatus': adoptionStatus,
+      'story': story,
+      'publishedAt': publishedAt,
     };
+  }
+
+  // Método para crear un objeto de mascota desde un mapa
+  factory PetModel.fromMap(Map<String, dynamic> map) {
+    return PetModel(
+      name: map['name'],
+      type: map['type'],
+      sex: map['sex'],
+      ageInYears: map['ageInYears'],
+      size: map['size'],
+      breed: map['breed'],
+      features: List<String>.from(map['features']),
+      colors: List<String>.from(map['colors']),
+      imageURLs: List<String>.from(map['imageURLs']),
+      shelterId: map['shelterId'],
+      adoptionStatus: map['adoptionStatus'],
+      story: map['story'],
+      publishedAt: map['publishedAt'],
+    );
   }
 }
