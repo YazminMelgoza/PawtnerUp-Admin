@@ -1,4 +1,4 @@
-import 'package:pawtnerup_admin/model/shelter_model.dart';
+import 'package:pawtnerup_admin/models/shelter_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 

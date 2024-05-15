@@ -1,24 +1,24 @@
 class ShelterModel {
+  String uid;
   String name;
   String phone;
   String? email;
   String? website;
   String description;
   String image;
-  String uid;
   String address;
   String latitude;
   String longitude;
   String? adoptionFormURL;
 
   ShelterModel({
+    required this.uid,
     required this.name,
     required this.phone,
     this.email,
     this.website,
     required this.description,
     required this.image,
-    required this.uid,
     required this.address,
     required this.latitude,
     required this.longitude,

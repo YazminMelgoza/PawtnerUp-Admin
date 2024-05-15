@@ -1,4 +1,5 @@
 class PetModel {
+  String id;
   String name;
   String type;
   String sex;
@@ -14,6 +15,7 @@ class PetModel {
   int publishedAt;
 
   PetModel({
+    required this.id,
     required this.name,
     required this.type,
     required this.sex,
@@ -32,6 +34,7 @@ class PetModel {
   // Método para convertir un objeto de mascota a un mapa
   Map<String, dynamic> toMap() {
     return {
+      'id': id,
       'name': name,
       'type': type,
       'sex': sex,
@@ -51,6 +54,7 @@ class PetModel {
   // Método para crear un objeto de mascota desde un mapa
   factory PetModel.fromMap(Map<String, dynamic> map) {
     return PetModel(
+      id: map['id'],
       name: map['name'],
       type: map['type'],
       sex: map['sex'],
