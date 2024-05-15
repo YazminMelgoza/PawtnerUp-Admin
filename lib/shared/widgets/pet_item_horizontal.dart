@@ -87,7 +87,7 @@ class PetItem extends StatelessWidget {
     );
   }
 
-  Widget _buildLocation() {
+  Widget buildLocation() {
     return Text(
       data["location"],
       maxLines: 1,

@@ -6,7 +6,7 @@ import 'package:pawtnerup_admin/config/config.dart';
 import 'package:pawtnerup_admin/shared/widgets/bottombar.dart';
 import 'package:flutter/material.dart';
 //Test
-import 'package:pawtnerup_admin/app/menu/screen/Pet/petPage.dart';
+import 'package:pawtnerup_admin/app/menu/screen/Pet/pet_page.dart';
 
 class RootApp extends StatefulWidget {
   const RootApp({super.key});
