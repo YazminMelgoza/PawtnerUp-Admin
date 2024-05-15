@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'custom_image.dart';
+import 'package:pawtnerup_admin/models/chat_model.dart';
 
 class ChatItem extends StatelessWidget {
   const ChatItem(
@@ -10,7 +11,7 @@ class ChatItem extends StatelessWidget {
     this.profileSize = 50,
   });
 
-  final Map<String, dynamic> chatData;
+  final ChatModel chatData;
   final bool isNotified;
   final GestureTapCallback? onTap;
   final double profileSize;
@@ -61,7 +62,7 @@ class ChatItem extends StatelessWidget {
       children: <Widget>[
         Expanded(
           child: Text(
-            chatData['last_text'],
+            chatData.recentMessageContent ?? '',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(fontSize: 13),
@@ -73,7 +74,7 @@ class ChatItem extends StatelessWidget {
 
   Widget _buildPhoto() {
     return CustomImage(
-      chatData['image'],
+      chatData.userImageURL,
       width: profileSize,
       height: profileSize,
     );
@@ -85,7 +86,7 @@ class ChatItem extends StatelessWidget {
       children: <Widget>[
         Expanded(
           child: Text(
-            chatData['name'],
+            chatData.userName,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
@@ -93,7 +94,10 @@ class ChatItem extends StatelessWidget {
         ),
         const SizedBox(width: 5),
         Text(
-          chatData['date'],
+          chatData.recentMessageTime != null
+              ? DateTime.fromMillisecondsSinceEpoch(chatData.recentMessageTime!)
+                  .toString()
+              : '',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: const TextStyle(

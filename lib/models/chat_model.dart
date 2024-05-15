@@ -1,13 +1,33 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class ChatModel {
   String id;
-  List<String> participantsIds;
+  String petId;
+  String petName;
+  String petImageURL;
+  String shelterId;
+  String shelterName;
+  String shelterImageURL;
+  String userId;
+  String userName;
+  String userImageURL;
+  String conversationStatus;
   String? recentMessageContent;
   String? recentMessageSenderName;
   int? recentMessageTime;
 
   ChatModel({
     required this.id,
-    required this.participantsIds,
+    required this.petId,
+    required this.petName,
+    required this.petImageURL,
+    required this.shelterId,
+    required this.shelterName,
+    required this.shelterImageURL,
+    required this.userId,
+    required this.userName,
+    required this.userImageURL,
+    required this.conversationStatus,
     this.recentMessageContent,
     this.recentMessageSenderName,
     this.recentMessageTime,
@@ -17,7 +37,16 @@ class ChatModel {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'participantsIds': participantsIds,
+      'petId': petId,
+      'petName': petName,
+      'petImageURL': petImageURL,
+      'shelterId': shelterId,
+      'shelterName': shelterName,
+      'shelterImageURL': shelterImageURL,
+      'userId': userId,
+      'userName': userName,
+      'userImageURL': userImageURL,
+      'conversationStatus': conversationStatus,
       'recentMessageContent': recentMessageContent,
       'recentMessageSenderName': recentMessageSenderName,
       'recentMessageTime': recentMessageTime,
@@ -25,10 +54,20 @@ class ChatModel {
   }
 
   // Método para crear un objeto de chat desde un mapa
-  factory ChatModel.fromMap(Map<String, dynamic> map) {
+  factory ChatModel.fromFirebase(DocumentSnapshot doc) {
+    Map<String, dynamic> map = doc.data() as Map<String, dynamic>;
     return ChatModel(
-      id: map['id'],
-      participantsIds: List<String>.from(map['participantsIds']),
+      id: doc.id,
+      petId: map['petId'],
+      petName: map['petName'],
+      petImageURL: map['petImageURL'],
+      shelterId: map['shelterId'],
+      shelterName: map['shelterName'],
+      shelterImageURL: map['shelterImageURL'],
+      userId: map['userId'],
+      userName: map['userName'],
+      userImageURL: map['userImageURL'],
+      conversationStatus: map['conversationStatus'],
       recentMessageContent: map['recentMessageContent'],
       recentMessageSenderName: map['recentMessageSenderName'],
       recentMessageTime: map['recentMessageTime'],

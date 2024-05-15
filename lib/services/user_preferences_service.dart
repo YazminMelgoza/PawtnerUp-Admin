@@ -10,7 +10,7 @@ class UserPreferencesService {
         await _firestore.collection('user_preferences').doc(userId).get();
 
     if (userPreferencesSnapshot.exists) {
-      return UserPreferencesModel.fromMap(userPreferencesSnapshot.data()! as Map<String, dynamic>);
+      return UserPreferencesModel.fromFirebase(userPreferencesSnapshot);
     } else {
       return null;
     }

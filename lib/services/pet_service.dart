@@ -10,7 +10,7 @@ class PetService {
         await _firestore.collection('pets').doc(petId).get();
 
     if (petSnapshot.exists) {
-      return PetModel.fromMap(petSnapshot.data()! as Map<String, dynamic>);
+      return PetModel.fromFirebase(petSnapshot);
     } else {
       return null;
     }
@@ -33,7 +33,7 @@ class PetService {
 
   Future<List<PetModel>> getAllPets() async {
     QuerySnapshot petsSnapshot = await _firestore.collection('pets').get();
-    return petsSnapshot.docs.map((doc) => PetModel.fromMap(doc.data() as Map<String, dynamic>)).toList();
+    return petsSnapshot.docs.map((doc) => PetModel.fromFirebase(doc)).toList();
   }
 
   // Método para buscar las mascotas de acuerdo a la cercanía a una ubicación
@@ -65,19 +65,19 @@ class PetService {
         .get();
 
     if (petsSnapshot.docs.isEmpty) return [];
-    return petsSnapshot.docs.map((doc) => PetModel.fromMap(doc.data() as Map<String, dynamic>)).toList();
+    return petsSnapshot.docs.map((doc) => PetModel.fromFirebase(doc)).toList();
   }
 
   // Método para obtener las mascotas adoptadas
   Future<List<PetModel>> getAdoptedPets() async {
     QuerySnapshot petsSnapshot = await _firestore.collection('pets').where('adoptionStatus', isEqualTo: 'adopted').get();
-    return petsSnapshot.docs.map((doc) => PetModel.fromMap(doc.data() as Map<String, dynamic>)).toList();
+    return petsSnapshot.docs.map((doc) => PetModel.fromFirebase(doc)).toList();
   }
 
   // Método para obtener todas las mascotas disponibles
   Future<List<PetModel>> getAvailablePets() async {
     QuerySnapshot petsSnapshot = await _firestore.collection('pets').where('adoptionStatus', isEqualTo: 'available').get();
-    return petsSnapshot.docs.map((doc) => PetModel.fromMap(doc.data() as Map<String, dynamic>)).toList();
+    return petsSnapshot.docs.map((doc) => PetModel.fromFirebase(doc)).toList();
   }
 
   // Método para cancelar la adopción de una mascota

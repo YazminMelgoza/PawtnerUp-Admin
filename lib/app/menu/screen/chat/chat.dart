@@ -1,7 +1,9 @@
-import 'package:pawtnerup_admin/app/utils/data.dart';
 import 'package:pawtnerup_admin/shared/shared.dart';
 import 'package:pawtnerup_admin/shared/widgets/chat_item.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:pawtnerup_admin/services/chat_service.dart';
+import 'package:pawtnerup_admin/models/chat_model.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
@@ -11,9 +13,36 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
+  // instance of the chat service
+  final ChatService chatService = ChatService();
+  List<ChatModel> _chats = [];
+
+
   @override
   Widget build(BuildContext context) {
     return getBody(context);
+  }
+
+  
+  @override
+  void initState() {
+    super.initState();
+    // get the chats when the page is loaded
+    getChats();
+  }
+
+  // get the chats when the page is loaded
+  getChats() async {
+    // get the current user
+    User user = FirebaseAuth.instance.currentUser!;
+    // get the chats of the current user
+    // TODO: change the user id to the current user id
+    // List<ChatModel> chats = await chatService.getChatsByUserId(user.uid);
+    List<ChatModel> chats = await chatService.getChatsByUserId('Qw7Wuoi3AYO9HZTSkrRDQLVuuCI3');
+    // update the state of the chats
+    setState(() {
+      _chats = chats;
+    });
   }
 
   getBody(context) {
@@ -55,9 +84,9 @@ class _ChatPageState extends State<ChatPage> {
       padding: const EdgeInsets.all(10),
       shrinkWrap: true,
       children: List.generate(
-        chats.length,
+        _chats.length,
         (index) => ChatItem(
-          chats[index],
+          _chats[index],
           onTap: null
         ),
       ),

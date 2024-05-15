@@ -12,18 +12,23 @@ class ChatService {
         await _firestore.collection('chats').doc(chatId).get();
 
     if (chatSnapshot.exists) {
-      return ChatModel.fromMap(chatSnapshot.data()! as Map<String, dynamic>);
+      return ChatModel.fromFirebase(chatSnapshot);
     } else {
       return null;
     }
   } 
 
   // Método para ver todos los chats de un usuario
-  Future<List<ChatModel>> getChatsByUserId(String userId) async {
+  Future <List<ChatModel>> getChatsByUserId(String userId) async {
     QuerySnapshot chatsSnapshot = await _firestore.collection('chats')
-        .where('users', arrayContains: userId)
-        .get();
-    return chatsSnapshot.docs.map((doc) => ChatModel.fromMap(doc.data() as Map<String, dynamic>)).toList();
+      .where(
+        Filter.or(
+          Filter('userId', isEqualTo: userId),
+          Filter('shelterId', isEqualTo: userId)
+        )
+      ).get();
+
+    return chatsSnapshot.docs.map((doc) => ChatModel.fromFirebase(doc)).toList();
   }
 
   // Método para agregar un nuevo chat
@@ -54,7 +59,7 @@ class ChatService {
   // Método para obtener todos los mensajes de un chat
   Future<List<MessageModel>> getMessagesByChatId(String chatId) async {
     QuerySnapshot messagesSnapshot = await _firestore.collection('chats').doc(chatId).collection('messages').get();
-    return messagesSnapshot.docs.map((doc) => MessageModel.fromMap(doc.data() as Map<String, dynamic>)).toList();
+    return messagesSnapshot.docs.map((doc) => MessageModel.fromFirebase(doc)).toList();
   }
 
 

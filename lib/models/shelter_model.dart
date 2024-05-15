@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class ShelterModel {
   String uid;
   String name;
@@ -5,7 +7,7 @@ class ShelterModel {
   String? email;
   String? website;
   String description;
-  String image;
+  String imageURL;
   String address;
   String latitude;
   String longitude;
@@ -18,7 +20,7 @@ class ShelterModel {
     this.email,
     this.website,
     required this.description,
-    required this.image,
+    required this.imageURL,
     required this.address,
     required this.latitude,
     required this.longitude,
@@ -33,7 +35,7 @@ class ShelterModel {
       'email': email,
       'website': website,
       'description': description,
-      'image': image,
+      'image': imageURL,
       'uid': uid,
       'address': address,
       'latitude': latitude,
@@ -43,15 +45,16 @@ class ShelterModel {
   }
 
   // Método para crear un objeto de refugio desde un mapa
-  factory ShelterModel.fromMap(Map<String, dynamic> map) {
+  factory ShelterModel.fromFirebase(DocumentSnapshot doc) {
+    Map<String, dynamic> map = doc.data() as Map<String, dynamic>;  
     return ShelterModel(
       name: map['name'],
       phone: map['phone'],
       email: map['email'],
       website: map['website'],
       description: map['description'],
-      image: map['image'],
-      uid: map['uid'],
+      imageURL: map['imageURL'],
+      uid: doc.id,
       address: map['address'],
       latitude: map['latitude'],
       longitude: map['longitude'],

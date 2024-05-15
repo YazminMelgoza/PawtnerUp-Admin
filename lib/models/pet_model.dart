@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class PetModel {
   String id;
   String name;
@@ -52,9 +54,10 @@ class PetModel {
   }
 
   // Método para crear un objeto de mascota desde un mapa
-  factory PetModel.fromMap(Map<String, dynamic> map) {
+  factory PetModel.fromFirebase(DocumentSnapshot doc) {
+    Map<String, dynamic> map = doc.data() as Map<String, dynamic>;
     return PetModel(
-      id: map['id'],
+      id: doc.id,
       name: map['name'],
       type: map['type'],
       sex: map['sex'],
