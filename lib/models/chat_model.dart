@@ -13,7 +13,7 @@ class ChatModel {
   String userImageURL;
   String conversationStatus;
   String? recentMessageContent;
-  String? recentMessageSenderName;
+  String? recentMessageSenderId;
   int? recentMessageTime;
 
   ChatModel({
@@ -29,7 +29,7 @@ class ChatModel {
     required this.userImageURL,
     required this.conversationStatus,
     this.recentMessageContent,
-    this.recentMessageSenderName,
+    this.recentMessageSenderId,
     this.recentMessageTime,
   });
 
@@ -48,7 +48,7 @@ class ChatModel {
       'userImageURL': userImageURL,
       'conversationStatus': conversationStatus,
       'recentMessageContent': recentMessageContent,
-      'recentMessageSenderName': recentMessageSenderName,
+      'recentMessageSenderName': recentMessageSenderId,
       'recentMessageTime': recentMessageTime,
     };
   }
@@ -69,7 +69,7 @@ class ChatModel {
       userImageURL: map['userImageURL'],
       conversationStatus: map['conversationStatus'],
       recentMessageContent: map['recentMessageContent'],
-      recentMessageSenderName: map['recentMessageSenderName'],
+      recentMessageSenderId: map['recentMessageSenderId'],
       recentMessageTime: map['recentMessageTime'],
     );
   }

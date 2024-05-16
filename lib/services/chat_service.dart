@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pawtnerup_admin/models/chat_model.dart';
 import 'package:pawtnerup_admin/models/message_model.dart';
+// import stream_builder.dart
+
 
 class ChatService {
   // Instancia de Firestore
@@ -18,8 +20,24 @@ class ChatService {
     }
   } 
 
+  // stream para obtener todos los chats de un usuario
+  Stream<List<ChatModel>> getChatsByUserIdStream(String userId) {
+    return _firestore.collection('chats')
+      .where(
+        Filter.or(
+          Filter('userId', isEqualTo: userId),
+          Filter('shelterId', isEqualTo: userId)
+        )
+      ).snapshots().map((snapshot) => snapshot.docs.map((doc) => ChatModel.fromFirebase(doc)).toList());
+  }
+
+  // Stream para obtener todos los mensajes de un chat
+  Stream<List<MessageModel>> getMessagesByChatIdStream(String chatId) {
+    return _firestore.collection('chats').doc(chatId).collection('messages').orderBy('time', descending: false).snapshots().map((snapshot) => snapshot.docs.map((doc) => MessageModel.fromFirebase(doc)).toList());
+  }
+
   // Método para ver todos los chats de un usuario
-  Future <List<ChatModel>> getChatsByUserId(String userId) async {
+  Future<List<ChatModel>> getChatsByUserId(String userId) async {
     QuerySnapshot chatsSnapshot = await _firestore.collection('chats')
       .where(
         Filter.or(
@@ -51,17 +69,25 @@ class ChatService {
   Future<void> addMessageToChat(String chatId, MessageModel message) async {
     // iniciar una transacción para escribir el mensaje y actualizar el recentMessage
     WriteBatch batch = _firestore.batch();
-    batch.set(_firestore.collection('chats').doc(chatId).collection('messages').doc(), message.toMap());
-    batch.update(_firestore.collection('chats').doc(chatId), {'recentMessage': message.content});
+    batch.set(_firestore.collection('chats').doc(chatId).collection('messages').doc(), {
+      'content': message.content,
+      'imageURL': message.imageURL,
+      'senderId': message.senderId,
+      'senderName': message.senderName,
+      'time': message.time,
+    });
+    batch.update(_firestore.collection('chats').doc(chatId), {
+      'recentMessageContent': message.content,
+      'recentMessageSenderId': message.senderId,
+      'recentMessageTime': message.time,
+      }
+    );
     await batch.commit();
   }
 
   // Método para obtener todos los mensajes de un chat
   Future<List<MessageModel>> getMessagesByChatId(String chatId) async {
-    QuerySnapshot messagesSnapshot = await _firestore.collection('chats').doc(chatId).collection('messages').get();
+    QuerySnapshot messagesSnapshot = await _firestore.collection('chats').doc(chatId).collection('messages').orderBy('time').get();
     return messagesSnapshot.docs.map((doc) => MessageModel.fromFirebase(doc)).toList();
   }
-
-
-
 }

@@ -18,7 +18,7 @@ class UserSettingsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('User Profile'),
+        title: const Text('Refugio '),
         backgroundColor: AppColor.yellow,
         actions: [
           IconButton(onPressed: () {}, icon: const Icon(Icons.settings))

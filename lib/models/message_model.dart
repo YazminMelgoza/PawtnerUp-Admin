@@ -32,13 +32,14 @@ class MessageModel {
   // Método para crear un objeto de mensaje desde un mapa
   factory MessageModel.fromFirebase(DocumentSnapshot doc) {
     Map<String, dynamic> map = doc.data() as Map<String, dynamic>;  
+    // convert time strint to int
     return MessageModel(
       id: doc.id,
-      content: map['content'],
-      imageURL: map['imageURL'],
-      senderId: map['senderId'],
-      senderName: map['senderName'],
-      time: map['time'],
+      content: map['content'] ?? '',
+      imageURL: map['imageURL'] ?? '',
+      senderId: map['senderId'] ?? '',
+      senderName: map['senderName'] ?? '',
+      time: int.parse((map['time'] ?? '').toString()),
     );
   }
 }

@@ -134,6 +134,8 @@ class _RegisterFormState extends State<_RegisterForm> {
                   if (FirebaseAuth.instance.currentUser != null) {
                     FirebaseAuth.instance.currentUser
                         ?.updateDisplayName(username.text);
+                        // TODO update the photoURL
+                    // FirebaseAuth.instance.currentUser?.updatePhotoURL("https://firebasestorage.googleapis.com/v0/b/petappdb-5f982.appspot.com/o/profilePic%2FzTsbbIWzpkepFAPPFCeCJO1eHgy2.jpeg?alt=media&token=9d4aa1c7-5e92-4ecb-92a0-1a67ef312e55");
                     addPeople(username.text, email.text, uid!);
 
                     if (context.mounted) {

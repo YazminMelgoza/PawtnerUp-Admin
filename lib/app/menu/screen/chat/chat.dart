@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pawtnerup_admin/services/chat_service.dart';
 import 'package:pawtnerup_admin/models/chat_model.dart';
+import 'package:pawtnerup_admin/app/menu/screen/chat/chat_detail.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
@@ -20,29 +21,23 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    return getBody(context);
-  }
-
-  
-  @override
-  void initState() {
-    super.initState();
-    // get the chats when the page is loaded
-    getChats();
-  }
-
-  // get the chats when the page is loaded
-  getChats() async {
-    // get the current user
-    User user = FirebaseAuth.instance.currentUser!;
-    // get the chats of the current user
-    // TODO: change the user id to the current user id
-    // List<ChatModel> chats = await chatService.getChatsByUserId(user.uid);
-    List<ChatModel> chats = await chatService.getChatsByUserId('Qw7Wuoi3AYO9HZTSkrRDQLVuuCI3');
-    // update the state of the chats
-    setState(() {
-      _chats = chats;
-    });
+    return StreamBuilder<List<ChatModel>>(
+      stream: chatService.getChatsByUserIdStream(
+        FirebaseAuth.instance.currentUser!.uid,
+      ),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          _chats = snapshot.data!;
+          return Scaffold(
+            body: getBody(context),
+          );
+        } else {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+      },
+    );
   }
 
   getBody(context) {
@@ -71,7 +66,7 @@ class _ChatPageState extends State<ChatPage> {
           ),
           SizedBox(height: 15),
           CustomTextBox(
-            hint: "Search",
+            hint: "Buscar chats",
             prefix: Icon(Icons.search, color: Colors.grey),
           ),
         ],
@@ -87,7 +82,14 @@ class _ChatPageState extends State<ChatPage> {
         _chats.length,
         (index) => ChatItem(
           _chats[index],
-          onTap: null
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ChatDetailPage(chatData: _chats[index]),
+              ),
+            );
+          },
         ),
       ),
     );
