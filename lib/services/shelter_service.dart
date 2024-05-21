@@ -1,5 +1,11 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:pawtnerup_admin/models/shelter_model.dart'; // Asegúrate de importar el modelo aquí
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:pawtnerup_admin/models/shelter_model.dart'; 
+import 'package:pawtnerup_admin/provider/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class ShelterService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -26,6 +32,69 @@ class ShelterService {
     return docRef.id;
   }
 
+  Future<void> signInShelter(context, String email, String password) async {
+    ShelterModel? user = await getUserByEmail(email);
+    if (user == null) throw 'Datos incorrectos o usuario no encontrado.';
+    await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    Provider.of<AuthenticationProvider>(context, listen: false).user = user;
+  }
+
+  Future<String> uploadProfilePic(File image, String uid) async {
+    String fileName = 'profile_pics/$uid';
+    await FirebaseStorage.instance.ref(fileName).putFile(image);
+    return await FirebaseStorage.instance.ref(fileName).getDownloadURL();
+  }
+
+  Future<ShelterModel> createUser(String username, String email, String password, File image) async {
+  UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+    email: email,
+    password: password,
+  );
+  ShelterModel user = ShelterModel(
+    uid: userCredential.user!.uid,
+    name: username,
+    email: email,
+    phone: '',
+    address: '',
+    latitude: 0,
+    longitude: 0,
+    description: '',
+    imageURL: await uploadProfilePic(image, userCredential.user!.uid),
+  );
+  await _firestore.collection('users').doc(user.uid).set(user.toMap());
+  return user;
+  }
+
+  Future<void> signOutShelter(context) async {
+    await FirebaseAuth.instance.signOut();
+    Provider.of<AuthenticationProvider>(context, listen: false).removeUser();
+  }
+
+  // Método para obtener un refugio por su email
+  Future<ShelterModel?> getUserByEmail(String email) async {
+    QuerySnapshot userSnapshot = await _firestore
+        .collection('shelters')
+        .where('email', isEqualTo: email)
+        .get();
+
+    if (userSnapshot.docs.isNotEmpty) {
+      return ShelterModel.fromFirebase(userSnapshot.docs.first);
+    } else {
+      return null;
+    }
+  }
+
+  Future<bool> setShelterInProvider(context, User user) async {
+    ShelterModel? shelter = await getUserByEmail(user.email!);
+    if (shelter != null) {
+      return true;
+    }
+    return false;
+
+  }
   // Método para actualizar la información de un refugio
   Future<void> updateShelter(ShelterModel shelter) async {
     await _firestore.collection('shelters').doc(shelter.uid).update(shelter.toMap());
@@ -67,6 +136,4 @@ class ShelterService {
     }
     return sheltersSnapshot.docs.map((doc) => ShelterModel.fromFirebase(doc)).toList();
   }
-
-
 }

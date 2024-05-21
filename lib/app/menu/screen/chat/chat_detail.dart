@@ -1,18 +1,10 @@
-import 'dart:io';
-
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-
 import 'package:pawtnerup_admin/models/chat_model.dart';
 import 'package:pawtnerup_admin/models/message_model.dart';
 import 'package:pawtnerup_admin/services/chat_service.dart';
-import 'package:pawtnerup_admin/models/user_model.dart';
-import 'package:pawtnerup_admin/models/pet_model.dart';
 import 'package:pawtnerup_admin/services/pet_service.dart'; 
 import 'package:pawtnerup_admin/shared/widgets/custom_image.dart';
-import 'package:provider/provider.dart';
 
 
 class ChatDetailPage extends StatefulWidget {
@@ -29,7 +21,6 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
   final TextEditingController _messageController = TextEditingController();
 
   List<MessageModel> _messages = [];
-  ChatModel? _chat;
 
   @override
   Widget build(BuildContext context) {

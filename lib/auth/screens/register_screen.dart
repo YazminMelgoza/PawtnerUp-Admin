@@ -10,6 +10,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 //Utils for Google Login
 import 'package:pawtnerup_admin/utils/login_google_utils.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+// util for picking image
+import 'package:pawtnerup_admin/utils/pick_image.dart';
+import 'package:pawtnerup_admin/utils/show_snack_bar.dart';
+import 'dart:io';
+import 'package:pawtnerup_admin/services/user_service.dart';
 
 // RegisterScreen
 class RegisterScreen extends StatelessWidget {
@@ -43,7 +48,7 @@ class RegisterScreen extends StatelessWidget {
                     ),
                     const Spacer(flex: 1),
                     Text(
-                      'Crear cuenta',
+                      'Registra tu refugio',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                             color: Colors.white,
                           ),
@@ -84,6 +89,7 @@ class _RegisterFormState extends State<_RegisterForm> {
   final email = TextEditingController();
   final password = TextEditingController();
   final confirmPassword = TextEditingController();
+  File? image;
 
   final formKey = GlobalKey<FormState>();
 
@@ -94,9 +100,34 @@ class _RegisterFormState extends State<_RegisterForm> {
       child: Column(
         children: [
           const SizedBox(height: 30),
+          GestureDetector(
+            onTap: () async {
+              image = await pickImage(context);
+              setState(() {});
+            },
+            child: CircleAvatar(
+              radius: 50,
+              backgroundColor: AppColor.darkblue,
+              child: image != null
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(50),
+                      child: Image.file(
+                        image!,
+                        width: 100,
+                        height: 100,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                  : const Icon(
+                      Icons.add_a_photo,
+                      size: 50,
+                      color: Colors.white,
+                    ),
+            ),
+          ),
           const SizedBox(height: 30),
           CustomTextFormField(
-            label: 'Nombre completo',
+            label: 'Nombre del refugio',
             keyboardType: TextInputType.emailAddress,
             controller: username,
           ),
@@ -125,25 +156,20 @@ class _RegisterFormState extends State<_RegisterForm> {
             height: 60,
             child: CustomFilledButton(
               text: 'Crear',
-              buttonColor: AppColor.yellowCustom,
+              buttonColor: AppColor.blue,
               icon: MdiIcons.fromString("account-multiple-plus"),
               onPressed: () async {
+                if (!areFieldsValid()) return;
                 try {
-                  String? uid = await LoginGoogleUtils()
-                      .createUserWithEmail(email.text, password.text);
-                  if (FirebaseAuth.instance.currentUser != null) {
-                    FirebaseAuth.instance.currentUser
-                        ?.updateDisplayName(username.text);
-                        // TODO update the photoURL
-                    // FirebaseAuth.instance.currentUser?.updatePhotoURL("https://firebasestorage.googleapis.com/v0/b/petappdb-5f982.appspot.com/o/profilePic%2FzTsbbIWzpkepFAPPFCeCJO1eHgy2.jpeg?alt=media&token=9d4aa1c7-5e92-4ecb-92a0-1a67ef312e55");
-                    addPeople(username.text, email.text, uid!);
-
-                    if (context.mounted) {
-                      context.go("/Root");
-                    }
-                  }
+                  await UserService().createUser(
+                    username.text,
+                    email.text,
+                    password.text,
+                    image
+                  );
+                  if (context.mounted) context.go("/Root");
                 } catch (e) {
-                  debugPrint("$e");
+                  if (context.mounted) showSnackBar(context, e.toString());
                 }
               },
             ),
@@ -190,5 +216,30 @@ class _RegisterFormState extends State<_RegisterForm> {
         ],
       ),
     );
+  }
+
+  bool areFieldsValid() {
+    if (username.text.isEmpty) {
+      showSnackBar(context, 'Por favor, ingresa tu nombre');
+      return false;
+    }
+    if (email.text.isEmpty) {
+      showSnackBar(context, 'Por favor, ingresa tu correo');
+      return false;
+    }
+    if (password.text.isEmpty) {
+      showSnackBar(context, 'Por favor, ingresa tu contraseña');
+      return false;
+    }
+    if (confirmPassword.text.isEmpty) {
+      showSnackBar(context, 'Por favor, repite tu contraseña');
+      return false;
+    }
+    if (password.text != confirmPassword.text) {
+      showSnackBar(context, 'Las contraseñas no coinciden');
+      return false;
+    }
+    return true;
+
   }
 }

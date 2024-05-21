@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'custom_image.dart';
 import 'package:pawtnerup_admin/models/chat_model.dart';
+import 'package:relative_time/relative_time.dart';
 
 class ChatItem extends StatelessWidget {
   const ChatItem(
@@ -73,11 +74,30 @@ class ChatItem extends StatelessWidget {
   }
 
   Widget _buildPhoto() {
-    return CustomImage(
-      chatData.userImageURL,
-      width: profileSize,
-      height: profileSize,
-    );
+    if (chatData.userImageURL != '') {
+      return CustomImage(
+        chatData.userImageURL,
+        width: profileSize,
+        height: profileSize,
+        fit: BoxFit.cover,
+        radius: 50,
+      );
+    }
+    else {
+      return Container(
+        width: profileSize,
+        height: profileSize,
+        decoration: BoxDecoration(
+          color: Colors.grey[200],
+          borderRadius: BorderRadius.circular(50),
+        ),
+        child: const Icon(
+          Icons.person,
+          color: Colors.grey,
+          size: 30,
+        ),
+      );
+    }
   }
 
   Widget buildNameAndTime() {

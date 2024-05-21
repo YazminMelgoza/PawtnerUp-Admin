@@ -5,8 +5,13 @@ import 'package:pawtnerup_admin/config/router/app_router.dart';
 
 // Firebase Imports
 import 'package:firebase_core/firebase_core.dart';
+<<<<<<< Updated upstream
 import 'package:provider/provider.dart';
+=======
+import 'package:pawtnerup_admin/provider/auth_provider.dart';
+>>>>>>> Stashed changes
 import 'firebase_options.dart';
+import 'package:provider/provider.dart';  
 
 // Hive Imports
 import 'package:hive_flutter/hive_flutter.dart';
@@ -33,6 +38,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+<<<<<<< Updated upstream
         ChangeNotifierProvider(create: (_) => AuthenticationProvider())
       ],
       child: MaterialApp.router(
@@ -41,6 +47,16 @@ class MyApp extends StatelessWidget {
         theme: AppTheme().getTheme(),
         debugShowCheckedModeBanner: false,
       ),
+=======
+        ChangeNotifierProvider(create: (_) => AuthenticationProvider()),
+      ],
+    child: MaterialApp.router(
+      title: 'Pawtner Up',
+      routerConfig: appRouter,
+      theme: AppTheme().getTheme(),
+      debugShowCheckedModeBanner: false,
+    )
+>>>>>>> Stashed changes
     );
   }
 }

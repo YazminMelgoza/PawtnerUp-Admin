@@ -25,7 +25,8 @@ class LoginGoogleUtils {
 
   //LoginUser with email
   Future<UserCredential> loginUserWithEmail(emailAddress, password) async {
-    final credential = await FirebaseAuth.instance
+    // check if email does exists in the database
+    UserCredential credential = await FirebaseAuth.instance
         .signInWithEmailAndPassword(email: emailAddress, password: password);
 
     return credential;

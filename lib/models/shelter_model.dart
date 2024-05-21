@@ -9,8 +9,8 @@ class ShelterModel {
   String description;
   String imageURL;
   String address;
-  String latitude;
-  String longitude;
+  double latitude;
+  double longitude;
   String? adoptionFormURL;
 
   ShelterModel({
