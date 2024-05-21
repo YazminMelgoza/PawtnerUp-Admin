@@ -159,13 +159,6 @@ class PetProfilePage extends StatelessWidget {
 
                               ElevatedButton(
                                 onPressed: () async {
-                                  goToChat(
-                                      context: context,
-                                      chatService: _chatService,
-                                      shelter: shelter,
-                                      pet: pet,
-                                      user: FirebaseAuth.instance.currentUser!
-                                  );
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color.fromRGBO(11, 96, 151, 0.7),
@@ -180,13 +173,6 @@ class PetProfilePage extends StatelessWidget {
                                     IconButton(
                                       icon: const Icon(Icons.chat),
                                       color: Colors.white,  onPressed: () async {
-                                      goToChat(
-                                          context: context,
-                                          chatService: _chatService,
-                                          shelter: shelter,
-                                          pet: pet,
-                                          user: FirebaseAuth.instance.currentUser!
-                                      );
                                     }, // This button won't have a separate action (optional)
                                     )
                                     ,
@@ -226,52 +212,6 @@ class PetProfilePage extends StatelessWidget {
         }
       },
     );
-  }
-
-  void goToChat(
-      {required BuildContext context,
-        required ChatService chatService,
-        required ShelterModel shelter,
-        required PetModel pet,
-        required User user}) async {
-    ChatModel? chatRoom = await _chatService.checkChat(
-        FirebaseAuth.instance.currentUser!.uid, pet.shelterId, pet.id);
-
-    if (chatRoom != null && context.mounted) {
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => ChatDetailPage(chatData: chatRoom!)));
-    } else {
-      final AuthenticationProvider _authProvider =
-      Provider.of<AuthenticationProvider>(context, listen: false);
-      UserModel user = _authProvider.user!;
-      chatRoom = ChatModel(
-        id: '',
-        userId: user.uid,
-        userImageURL: user.profilePicURL ?? '',
-        userName: user.name,
-        shelterImageURL: shelter.imageURL,
-        shelterName: shelter.name,
-        shelterId: pet.shelterId,
-        petId: pet.id,
-        petName: pet.name,
-        petImageURL: pet.imageURLs[0],
-        recentMessageContent: null,
-        recentMessageTime: null,
-        recentMessageSenderId: null,
-        conversationStatus: 'intento de adopción',
-      );
-
-      DocumentReference newChatDoc = await _chatService.createChat(chatRoom);
-      chatRoom.id = newChatDoc.id;
-      if (context.mounted) {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ChatDetailPage(chatData: chatRoom!)));
-      }
-    }
   }
 
   Widget _buildInfoContainer({required String label, required String value}) {

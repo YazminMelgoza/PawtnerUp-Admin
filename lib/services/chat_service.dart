@@ -18,18 +18,6 @@ class ChatService {
     }
   }
 
-<<<<<<< Updated upstream
-  // stream para obtener todos los chats de un usuario
-  Stream<List<ChatModel>> getChatsByUserIdStream(String userId) {
-    return _firestore.collection('chats')
-        .where(
-        Filter.or(
-            Filter('userId', isEqualTo: userId),
-            Filter('shelterId', isEqualTo: userId)
-        )
-    ).snapshots().map((snapshot) => snapshot.docs.map((doc) => ChatModel.fromFirebase(doc)).toList());
-  }
-=======
 // stream para obtener todos los chats de un usuario
 Stream<List<ChatModel>> getChatsByUserIdStream(String userId) {
   return _firestore.collection('chats')
@@ -56,7 +44,6 @@ Stream<List<ChatModel>> getChatsByUserIdStream(String userId) {
       }
     );
 }
->>>>>>> Stashed changes
 
   // Stream para obtener todos los mensajes de un chat
   Stream<List<MessageModel>> getMessagesByChatIdStream(String chatId) {
@@ -71,11 +58,7 @@ Stream<List<ChatModel>> getChatsByUserIdStream(String userId) {
             Filter('userId', isEqualTo: userId),
             Filter('shelterId', isEqualTo: userId)
         )
-<<<<<<< Updated upstream
-    ).get();
-=======
       ).orderBy('time').get();
->>>>>>> Stashed changes
 
     return chatsSnapshot.docs.map((doc) => ChatModel.fromFirebase(doc)).toList();
   }

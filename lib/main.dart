@@ -5,16 +5,8 @@ import 'package:pawtnerup_admin/config/router/app_router.dart';
 
 // Firebase Imports
 import 'package:firebase_core/firebase_core.dart';
-<<<<<<< Updated upstream
-import 'package:provider/provider.dart';
-=======
-import 'package:pawtnerup_admin/provider/auth_provider.dart';
->>>>>>> Stashed changes
 import 'firebase_options.dart';
 import 'package:provider/provider.dart';  
-
-// Hive Imports
-import 'package:hive_flutter/hive_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,10 +15,6 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
-  // Hive Initialization
-  await Hive.initFlutter();
-  await Hive.openBox('userBox');
 
   runApp(const MyApp());
 }
@@ -38,8 +26,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-<<<<<<< Updated upstream
-        ChangeNotifierProvider(create: (_) => AuthenticationProvider())
+        ChangeNotifierProvider(create: (_) => AuthenticationProvider()),
       ],
       child: MaterialApp.router(
         title: 'Pawtner Up',
@@ -47,16 +34,6 @@ class MyApp extends StatelessWidget {
         theme: AppTheme().getTheme(),
         debugShowCheckedModeBanner: false,
       ),
-=======
-        ChangeNotifierProvider(create: (_) => AuthenticationProvider()),
-      ],
-    child: MaterialApp.router(
-      title: 'Pawtner Up',
-      routerConfig: appRouter,
-      theme: AppTheme().getTheme(),
-      debugShowCheckedModeBanner: false,
-    )
->>>>>>> Stashed changes
     );
   }
 }
