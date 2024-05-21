@@ -40,13 +40,13 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
-          color: AppColor.blue,
+          color: AppColor.yellow,
         ),
         child: const Center(
           child: Text(
             'PawtnerUp',
             style: TextStyle(
-              color: Colors.white,
+              color: AppColor.textBoxColor,
               fontSize: 40,
               fontWeight: FontWeight.bold,
               fontFamily: 'PottaOne',

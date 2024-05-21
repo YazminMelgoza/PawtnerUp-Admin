@@ -8,6 +8,7 @@ import 'package:pawtnerup_admin/provider/auth_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../../config/theme/color.dart';
 import '../../../../services/shelter_service.dart';
 import 'package:pawtnerup_admin/services/chat_service.dart';
 
@@ -298,7 +299,7 @@ class PetProfilePage extends StatelessWidget {
             style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Color.fromRGBO(11, 96, 151, .99),
+              color: AppColor.yellowCustom,
             ),
             textAlign: TextAlign.center,
           ),
@@ -343,7 +344,7 @@ class PetProfilePage extends StatelessWidget {
             style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Color.fromRGBO(11, 96, 151, .99),
+              color: AppColor.yellowCustom,
             ),
             textAlign: TextAlign.center,
           ),
