@@ -17,6 +17,8 @@ import 'dart:io';
 import 'package:pawtnerup_admin/services/user_service.dart';
 
 // RegisterScreen
+import 'package:flutter/material.dart';
+
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
 
@@ -25,57 +27,63 @@ class RegisterScreen extends StatelessWidget {
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
-        body: GeometricalBackground(
-          child: SingleChildScrollView(
-            physics: const ClampingScrollPhysics(),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const SizedBox(height: 80),
-                // Icon Banner
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 10.0),
-                      child: IconButton(
-                        onPressed: () {
-                          context.go("/login");
-                        },
-                        icon: const Icon(Icons.arrow_back_rounded,
-                            size: 40, color: Colors.white),
-                      ),
-                    ),
-                    const Spacer(flex: 1),
-                    Text(
+        body: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Imagen de fondo con tus mascotas
+            Container(
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage("assets/images/BackgroundRegister.png"),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            // Imagen de mascota sin fondo posicionada estratégicamente
+            Positioned(
+              top: 35.0,
+              left: (MediaQuery.of(context).size.width - 250) / 2,
+              child: const Image(
+                image: AssetImage("assets/images/mascotasRegister.png"),
+                width: 250.0,
+                height: 250.0,
+              ),
+            ),
+            SingleChildScrollView(
+              physics: const ClampingScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 260),
+                  Container(
+                    color: Colors.transparent,
+                    child: Text(
                       'Registra tu refugio',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            color: Colors.white,
-                          ),
+                        color: AppColor.blue, fontWeight: FontWeight.bold, fontFamily: 'Outfit'
+                      ),
                     ),
-                    const Spacer(flex: 2),
-                  ],
-                ),
-                const SizedBox(height: 50),
-                Container(
-                  height: MediaQuery.of(context).size.height - 260,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(100),
+                  ),                  Container(
+                    height: MediaQuery.of(context).size.height - 260,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.transparent,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(100),
+                      ),
                     ),
+                    child: const _RegisterForm(),
                   ),
-                  child: const _RegisterForm(),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
   }
 }
+
 
 class _RegisterForm extends StatefulWidget {
   const _RegisterForm();
@@ -99,58 +107,60 @@ class _RegisterFormState extends State<_RegisterForm> {
       padding: const EdgeInsets.symmetric(horizontal: 50),
       child: Column(
         children: [
-          const SizedBox(height: 30),
+          const SizedBox(height: 2),
           GestureDetector(
             onTap: () async {
               image = await pickImage(context);
               setState(() {});
             },
             child: CircleAvatar(
-              radius: 50,
+              radius: 45,
               backgroundColor: AppColor.darkblue,
               child: image != null
                   ? ClipRRect(
-                      borderRadius: BorderRadius.circular(50),
+                      borderRadius: BorderRadius.circular(45),
                       child: Image.file(
                         image!,
-                        width: 100,
-                        height: 100,
+                        width: 80,
+                        height: 80,
                         fit: BoxFit.cover,
                       ),
                     )
                   : const Icon(
                       Icons.add_a_photo,
-                      size: 50,
+                      size: 45,
                       color: Colors.white,
                     ),
             ),
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 15),
           CustomTextFormField(
             label: 'Nombre del refugio',
             keyboardType: TextInputType.emailAddress,
             controller: username,
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 15),
           CustomTextFormField(
             label: 'Correo',
             keyboardType: TextInputType.emailAddress,
             controller: email,
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 15),
           CustomTextFormField(
             label: 'Contraseña',
             obscureText: true,
             controller: password,
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 15),
           CustomTextFormField(
             label: 'Repita la contraseña',
             obscureText: true,
             controller: confirmPassword,
           ),
-          const SizedBox(height: 40),
+          const SizedBox(height: 20),
           //Button to create user using email and password
+
+
           SizedBox(
             width: double.infinity,
             height: 60,
@@ -174,9 +184,8 @@ class _RegisterFormState extends State<_RegisterForm> {
               },
             ),
           ),
-          const SizedBox(height: 15),
           //Login with Google Button
-          SizedBox(
+          /*SizedBox(
             width: double.infinity,
             height: 60,
             child: CustomFilledButton(
@@ -197,9 +206,7 @@ class _RegisterFormState extends State<_RegisterForm> {
                 }
               },
             ),
-          ),
-          const SizedBox(height: 25),
-          const Spacer(flex: 2),
+          ),*/
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
