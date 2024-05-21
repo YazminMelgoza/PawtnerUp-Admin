@@ -11,41 +11,25 @@ class ChatService {
   // Método para obtener un chat por su ID
   Future<ChatModel?> getChatById(String chatId) async {
     DocumentSnapshot chatSnapshot =
-        await _firestore.collection('chats').doc(chatId).get();
+    await _firestore.collection('chats').doc(chatId).get();
 
     if (chatSnapshot.exists) {
       return ChatModel.fromFirebase(chatSnapshot);
     } else {
       return null;
     }
-  } 
+  }
 
-// stream para obtener todos los chats de un usuario
-Stream<List<ChatModel>> getChatsByUserIdStream(String userId) {
-  return _firestore.collection('chats')
-    .where(
-      Filter.or(
-        Filter('userId', isEqualTo: userId),
-        Filter('shelterId', isEqualTo: userId)
-      )
-    ).snapshots()
-    .map(
-      (snapshot) {
-        List<ChatModel> chats = snapshot.docs
-            .map((doc) => ChatModel.fromFirebase(doc))
-            .toList();
-        
-        // Ordenar la lista de chats por recentMessageTime
-        chats.sort((a, b) {
-          if (a.recentMessageTime == null) return 1;
-          if (b.recentMessageTime == null) return -1;
-          return b.recentMessageTime!.compareTo(a.recentMessageTime!);
-        });
-        
-        return chats;
-      }
-    );
-}
+  // stream para obtener todos los chats de un usuario
+  Stream<List<ChatModel>> getChatsByUserIdStream(String userId) {
+    return _firestore.collection('chats')
+        .where(
+        Filter.or(
+            Filter('userId', isEqualTo: userId),
+            Filter('shelterId', isEqualTo: userId)
+        )
+    ).snapshots().map((snapshot) => snapshot.docs.map((doc) => ChatModel.fromFirebase(doc)).toList());
+  }
 
   // Stream para obtener todos los mensajes de un chat
   Stream<List<MessageModel>> getMessagesByChatIdStream(String chatId) {
@@ -55,12 +39,12 @@ Stream<List<ChatModel>> getChatsByUserIdStream(String userId) {
   // Método para ver todos los chats de un usuario
   Future<List<ChatModel>> getChatsByUserId(String userId) async {
     QuerySnapshot chatsSnapshot = await _firestore.collection('chats')
-      .where(
+        .where(
         Filter.or(
-          Filter('userId', isEqualTo: userId),
-          Filter('shelterId', isEqualTo: userId)
+            Filter('userId', isEqualTo: userId),
+            Filter('shelterId', isEqualTo: userId)
         )
-      ).orderBy('time').get();
+    ).get();
 
     return chatsSnapshot.docs.map((doc) => ChatModel.fromFirebase(doc)).toList();
   }
@@ -80,6 +64,24 @@ Stream<List<ChatModel>> getChatsByUserIdStream(String userId) {
     await _firestore.collection('chats').doc(chat.id).update(chat.toMap());
   }
 
+  // Método para revisar si existe un chat entre dos usuarios y una mascota
+  Future<ChatModel?> checkChat(String userId, String shelterId, String petId) async {
+    QuerySnapshot chatsSnapshot = await _firestore.collection('chats')
+        .where('userId', isEqualTo: userId)
+        .where('shelterId', isEqualTo: shelterId)
+        .where('petId', isEqualTo: petId)
+        .get();
+
+    if (chatsSnapshot.docs.isNotEmpty) {
+      return ChatModel.fromFirebase(chatsSnapshot.docs.first);
+    } else {
+      return null;
+    }
+  }
+
+  Future<DocumentReference> createChat(ChatModel chat) async {
+    return _firestore.collection('chats').add(chat.toMap());
+  }
 
   // Metodo para añadir un mensaje a un chat
   Future<void> addMessageToChat(String chatId, MessageModel message) async {
@@ -96,7 +98,7 @@ Stream<List<ChatModel>> getChatsByUserIdStream(String userId) {
       'recentMessageContent': message.content,
       'recentMessageSenderId': message.senderId,
       'recentMessageTime': message.time,
-      }
+    }
     );
     await batch.commit();
   }
