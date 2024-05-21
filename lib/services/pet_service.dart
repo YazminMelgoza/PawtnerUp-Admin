@@ -1,5 +1,4 @@
 import "package:cloud_firestore/cloud_firestore.dart";
-import "package:flutter/cupertino.dart";
 import "package:pawtnerup_admin/models/pet_model.dart";
 
 class PetService {
@@ -33,15 +32,8 @@ class PetService {
   }
 
   Future<List<PetModel>> getAllPets() async {
-    print("helloworld");
-    try {
-      QuerySnapshot petsSnapshot = await _firestore.collection('pets').get();
-      return petsSnapshot.docs.map((doc) => PetModel.fromFirebase(doc))
-          .toList();
-    } catch (e){
-      print(e);
-      return [];
-    }
+    QuerySnapshot petsSnapshot = await _firestore.collection('pets').get();
+    return petsSnapshot.docs.map((doc) => PetModel.fromFirebase(doc)).toList();
   }
 
   // Método para buscar las mascotas de acuerdo a la cercanía a una ubicación
