@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart' as riverpod;
 import 'package:pawtnerup_admin/provider/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:pawtnerup_admin/config/config.dart';
@@ -16,18 +17,15 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(const MyApp());
+  runApp(riverpod.ProviderScope(
+    child: MyApp(), // Replace MyApp with your main app widget
+  ));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => AuthenticationProvider()),
-      ],
+    return riverpod.ProviderScope(
       child: MaterialApp.router(
         title: 'Pawtner Up',
         routerConfig: appRouter,

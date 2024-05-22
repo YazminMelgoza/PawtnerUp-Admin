@@ -1,5 +1,6 @@
 // import 'package:pawtnerup_admin/Json/users.dart';
 // import 'package:pawtnerup_admin/auth/db/sqlite.dart';
+import 'package:pawtnerup_admin/auth/screens/register_data.dart';
 import 'package:pawtnerup_admin/config/config.dart';
 import 'package:pawtnerup_admin/services/firebase_service.dart';
 import 'package:flutter/material.dart';
@@ -54,7 +55,7 @@ class RegisterScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 260),
+                  const SizedBox(height: 255),
                   Container(
                     color: Colors.transparent,
                     child: Text(
@@ -64,7 +65,7 @@ class RegisterScreen extends StatelessWidget {
                       ),
                     ),
                   ),                  Container(
-                    height: MediaQuery.of(context).size.height - 260,
+                    height: MediaQuery.of(context).size.height - 300,
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: Colors.transparent,
@@ -107,7 +108,7 @@ class _RegisterFormState extends State<_RegisterForm> {
       padding: const EdgeInsets.symmetric(horizontal: 50),
       child: Column(
         children: [
-          const SizedBox(height: 2),
+          const SizedBox(height: 0),
           GestureDetector(
             onTap: () async {
               image = await pickImage(context);
@@ -170,18 +171,19 @@ class _RegisterFormState extends State<_RegisterForm> {
               icon: MdiIcons.fromString("account-multiple-plus"),
               onPressed: () async {
                 if (!areFieldsValid()) return;
-                try {
-                  await UserService().createUser(
-                    username.text,
-                    email.text,
-                    password.text,
-                    image
-                  );
-                  if (context.mounted) context.go("/Root");
-                } catch (e) {
-                  if (context.mounted) showSnackBar(context, e.toString());
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => RegisterData(
+                      email: email.text,
+                      username: username.text,
+                      password: password.text,
+                      image: image,
+                    ),
+                  ),
+                );
+
                 }
-              },
             ),
           ),
           //Login with Google Button
