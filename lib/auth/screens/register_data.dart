@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:pawtnerup_admin/config/config.dart';
 import 'package:pawtnerup_admin/services/firebase_service.dart';
+import 'package:pawtnerup_admin/services/shelter_service.dart';
 import 'package:pawtnerup_admin/shared/shared.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -31,6 +32,8 @@ class RegisterData extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
@@ -112,11 +115,23 @@ class _RegisterForm extends StatefulWidget {
 class _RegisterFormState extends State<_RegisterForm> {
   final phone = TextEditingController();
   final website = TextEditingController();
+  final descripcion = TextEditingController();
   final adoptionFormURL = TextEditingController();
-
   final formKey = GlobalKey<FormState>();
+
+  Address? selectedAddress; // Add this line
+  Coords? selectedCoords; // Add this line
+  late final String reference;
+
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    final border = OutlineInputBorder(
+        borderSide: const BorderSide(color: Colors.transparent),
+        borderRadius: BorderRadius.circular(40));
+
+    const borderRadius = Radius.circular(15);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 50),
       child: Column(
@@ -131,29 +146,76 @@ class _RegisterFormState extends State<_RegisterForm> {
           const SizedBox(height: 15),
           CustomTextFormField(
             label: 'URL de Pagina Web',
-            keyboardType: TextInputType.url,
+            keyboardType: TextInputType.text,
             controller: website,
           ),
           const SizedBox(height: 15),
           CustomTextFormField(
             label: 'URL del forms de adopcion',
-            keyboardType: TextInputType.url,
+            keyboardType: TextInputType.text,
             controller: adoptionFormURL,
           ),
           const SizedBox(height: 15),
-
-          const Column(
-          children: [
-            SizedBox(
-              height: 55, // Define a fixed height for the AddressInput
-              child: Example()
+          Column(
+            children: [
+              SizedBox(
+                height: 55,
+                child: Example(
+                  onAddressSelected: (Address address) {
+                    setState(() {
+                      selectedAddress = address;
+                      selectedCoords = GiveAddress(address);
+                      reference = address.reference!;
+                    });
+                  },
+                ),
               ),
-
-            SizedBox(height: 15), // Space after AddressInput
-          ],
-        ), // Add the address input widget here
+              const SizedBox(height: 15),
+      Container(
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: const BorderRadius.only(
+                topLeft: borderRadius,
+                bottomLeft: borderRadius,
+                bottomRight: borderRadius),
+            boxShadow: [
+              BoxShadow(
+                  color: Colors.black.withOpacity(0.06),
+                  blurRadius: 10,
+                  offset: const Offset(0, 5))
+            ]),
+        height: 100.0,
+        child: TextFormField(
+          controller: descripcion, // Utilizar controller
+          keyboardType: TextInputType.multiline, // Allow multiple lines
+          maxLines: null, // No limit on lines (optional)
+          style: const TextStyle(fontSize: 16, color: Colors.black54),
+          decoration: InputDecoration(
+            floatingLabelStyle: const TextStyle(
+              color: AppColor.yellow,
+              fontWeight: FontWeight.bold,
+              fontSize: 15,
+            ),
+            enabledBorder: border,
+            focusedBorder: border,
+            errorBorder: border.copyWith(
+                borderSide: BorderSide(color: Colors.red.shade800)),
+            focusedErrorBorder: border.copyWith(
+                borderSide: BorderSide(color: Colors.red.shade800)),
+            isDense: true,
+            hintText: "Descripcion",
+            focusColor: colors.primary,
+          ),
+        ),
+      )
+              /*if (selectedAddress != null) ...[
+                Text('Selected Address: ${selectedAddress!.toString()}'), // Update this line
+                if (selectedCoords != null)
+                  Text('Coordinates: ${selectedCoords!.latitude}, ${selectedCoords!.longitude}'),
+              ],*/
+            ],
+          ),
           const SizedBox(height: 20),
-          // Button to create user using email and password
           SizedBox(
             width: double.infinity,
             height: 60,
@@ -164,7 +226,12 @@ class _RegisterFormState extends State<_RegisterForm> {
               onPressed: () async {
                 if (!areFieldsValid()) return;
                 try {
-                  await UserService().createUser(
+                  await ShelterService().createUser(
+                    phone.text,
+                    reference,
+                    selectedCoords?.latitude,
+                    selectedCoords?.longitude,
+                    descripcion.text,
                     widget.username,
                     widget.email,
                     widget.password,
@@ -177,31 +244,6 @@ class _RegisterFormState extends State<_RegisterForm> {
               },
             ),
           ),
-          // Login with Google Button
-          /*
-          SizedBox(
-            width: double.infinity,
-            height: 60,
-            child: CustomFilledButton(
-              text: "Google",
-              buttonColor: AppColor.blue,
-              icon: MdiIcons.fromString("google"),
-              onPressed: () async {
-                try {
-                  await LoginGoogleUtils().signInWithGoogle();
-                  //if is there a currentUser signed, we will go to the root
-                  if (FirebaseAuth.instance.currentUser != null) {
-                    if (context.mounted) {
-                      context.go("/Root");
-                    }
-                  }
-                } catch (e) {
-                  debugPrint("$e");
-                }
-              },
-            ),
-          ),
-          */
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -227,6 +269,10 @@ class _RegisterFormState extends State<_RegisterForm> {
     }
     return true;
   }
+}
+
+Coords? GiveAddress(Address shelterAddress) {
+  return shelterAddress.coords;
 }
 
 

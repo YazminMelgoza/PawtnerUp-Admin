@@ -40,8 +40,8 @@ final routeProvider = ChangeNotifierProvider<RouteNotifier>((ref) => RouteNotifi
 */
 // Main widget for the example
 class Example extends StatefulWidget {
-  const Example({Key? key}) : super(key: key);
-
+  const Example({Key? key, required this.onAddressSelected}) : super(key: key);
+  final void Function(Address) onAddressSelected;
 
   @override
   State<Example> createState() => _ExampleState();
@@ -91,7 +91,9 @@ late final Address shelterLocation;
             builder: (BuildContext context) => AddressSearchDialog(
               geoMethods: geoMethods,
               controller: controllerv,
-              onDone: (Address address) => shelterAddress = address,
+              onDone: (Address address) {
+                widget.onAddressSelected(address); // Call the callback
+              },
             )
         ),
         style: const TextStyle(fontSize: 16, color: Colors.black54),
