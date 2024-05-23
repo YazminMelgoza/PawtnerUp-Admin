@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:pawtnerup_admin/config/config.dart';
 import 'package:pawtnerup_admin/models/chat_model.dart';
 import 'package:pawtnerup_admin/models/message_model.dart';
 import 'package:pawtnerup_admin/services/chat_service.dart';
@@ -12,6 +13,7 @@ import 'package:pawtnerup_admin/models/pet_model.dart';
 import 'package:pawtnerup_admin/models/shelter_model.dart';
 import 'package:pawtnerup_admin/provider/auth_provider.dart';
 import 'package:pawtnerup_admin/services/shelter_service.dart';
+import 'package:pawtnerup_admin/utils/ask_confirmation_to_continue.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
@@ -71,14 +73,32 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
   }
 
   Widget _buildTopBar() {
+
+    List<Map<String, dynamic>> options = [
+      {
+        'value': 'finalizado',
+        'color': Colors.green,
+        'icon': Icons.check,
+      },
+      {
+        'value': 'en curso',
+        'color': Colors.blue,
+        'icon': Icons.access_time,
+      },
+      {
+        'value': 'cancelado',
+        'color': Colors.red,
+        'icon': Icons.cancel,
+      },
+    ];
     return AppBar(
       title: 
       // show the name of the pet and the shelter in the appbar
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(widget.chatData.petName),
-          Text(widget.chatData.shelterName,
+          Text(widget.chatData.userName),
+          Text(widget.chatData.petName,
           style: const TextStyle(
             fontSize: 12,
             color: Colors.grey)
@@ -140,28 +160,32 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
         ],
       ),
       actions: [
-        // show the status of the conversation
-        IconButton(
-          icon: const Icon(Icons.info_outline),
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  title: const Text('Estado de la conversación'),
-                  content: Text(widget.chatData.conversationStatus),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text('Cerrar'),
-                    ),
+        // change the conversation status
+          DropdownButton(
+            items: options.map((option) {
+              return DropdownMenuItem(
+                value: option['value'],
+                child: Row(
+                  children: [
+                    Icon(option['icon'], color: option['color'], size: 20),
+                    const SizedBox(width: 5),
+                    Text(option['value']),
                   ],
-                );
-          },);
-          },
-        ),
+                ),
+              );
+            }).toList(),
+            onChanged: (value) async {
+              if (value == null) return;
+              bool confirmation = await askConfirmationToContinue(context, '¿Estás seguro de que quieres cambiar el status de la conversación a $value?');
+              if (!confirmation) return;
+              chatService.updateChatStatus(widget.chatData.id, value.toString());
+              setState(() {
+                widget.chatData.conversationStatus = value.toString();
+              });
+            },
+            // style the dropdown button
+            
+          )
         ],
     );
   }
@@ -300,7 +324,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.send),
+            icon: const Icon(Icons.send_rounded, color: AppColor.darkblue),
             onPressed: () {
               _sendMessage(authProvider.user!);
             },

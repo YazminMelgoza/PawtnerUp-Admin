@@ -22,6 +22,7 @@ class ChatPage extends StatefulWidget {
   State<ChatPage> createState() => _ChatPageState();
 }
 
+// TODO> ORDENAR CHATS POR FECHA DE ÚLTIMO MENSAJE
 class _ChatPageState extends State<ChatPage> {
   final ChatService _chatService = ChatService();
   List<ChatModel> chats = [];

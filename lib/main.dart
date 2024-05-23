@@ -6,7 +6,7 @@ import 'package:pawtnerup_admin/config/router/app_router.dart';
 // Firebase Imports
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-import 'package:provider/provider.dart';  
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
