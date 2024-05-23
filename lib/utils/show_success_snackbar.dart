@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:dismov_app/config/theme/color.dart';
 
-void showSnackbar(BuildContext context, String message) {
+void showSuccessSnackbar(BuildContext context, String message) {
   ScaffoldMessenger.of(context).showSnackBar(
    SnackBar(
      content: Text(
@@ -11,7 +10,7 @@ void showSnackbar(BuildContext context, String message) {
          fontWeight: FontWeight.w600,
        ),
      ),
-     backgroundColor: AppColor.blue,
+     backgroundColor: Colors.green,
      shape: RoundedRectangleBorder(
        borderRadius: BorderRadius.circular(10),
      ),

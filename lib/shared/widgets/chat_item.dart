@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'custom_image.dart';
 import 'package:pawtnerup_admin/models/chat_model.dart';
+import 'dart:async';
 import 'package:relative_time/relative_time.dart';
 
 class ChatItem extends StatelessWidget {
@@ -74,30 +75,11 @@ class ChatItem extends StatelessWidget {
   }
 
   Widget _buildPhoto() {
-    if (chatData.userImageURL != '') {
-      return CustomImage(
-        chatData.userImageURL,
-        width: profileSize,
-        height: profileSize,
-        fit: BoxFit.cover,
-        radius: 50,
-      );
-    }
-    else {
-      return Container(
-        width: profileSize,
-        height: profileSize,
-        decoration: BoxDecoration(
-          color: Colors.grey[200],
-          borderRadius: BorderRadius.circular(50),
-        ),
-        child: const Icon(
-          Icons.person,
-          color: Colors.grey,
-          size: 30,
-        ),
-      );
-    }
+    return CustomImage(
+      chatData.userImageURL,
+      width: profileSize,
+      height: profileSize,
+    );
   }
 
   Widget buildNameAndTime() {
@@ -106,26 +88,34 @@ class ChatItem extends StatelessWidget {
       children: <Widget>[
         Expanded(
           child: Text(
-            chatData.userName,
+            '${chatData.petName} - ${chatData.shelterName}',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
           ),
         ),
         const SizedBox(width: 5),
-        Text(
-          chatData.recentMessageTime != null
-              ? DateTime.fromMillisecondsSinceEpoch(chatData.recentMessageTime!)
-                  .toString()
-              : '',
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-            fontSize: 11,
-            color: Colors.grey,
-          ),
-        )
+        StreamBuilder(
+          stream: Stream.periodic(const Duration(minutes: 1)),
+          builder: (context, snapshot) {
+            return Text(
+              _getTimeAgo(chatData.recentMessageTime),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 11,
+                color: Colors.grey,
+              ),
+            );
+          },
+        ),
       ],
     );
+  }
+
+  String _getTimeAgo(int? timestamp) {
+    if (timestamp == null) return '';
+    final timeAgo = DateTime.fromMillisecondsSinceEpoch(timestamp);
+    return RelativeTime.locale(const Locale('es')).format(timeAgo);
   }
 }

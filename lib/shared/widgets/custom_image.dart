@@ -14,6 +14,7 @@ class CustomImage extends StatelessWidget {
       this.fit = BoxFit.cover,
       this.isNetwork = true,
       this.radius = 50,
+      this.onPressed,
       this.borderRadius,
       this.isShadow = true,
       this.padding = 0
@@ -31,10 +32,17 @@ class CustomImage extends StatelessWidget {
   final double radius;
   final BorderRadiusGeometry? borderRadius;
   final BoxFit fit;
+  final Function? onPressed;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GestureDetector(
+      onTap: () {
+        if (onPressed != null) {
+          onPressed!();
+        }
+      },
+      child: Container(
       width: width,
       height: height,
       padding: EdgeInsets.all(padding.toDouble()),
@@ -57,7 +65,7 @@ class CustomImage extends StatelessWidget {
               image: AssetImage(image),
               fit: fit,
             ),
-    );
+    ),);
   }
 
   Widget _buildNetworkImage() {

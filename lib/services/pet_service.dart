@@ -18,6 +18,12 @@ class PetService {
       return null;
     }
   }
+
+  Future<List<PetModel>> getPetsByShelterId(String shelterId) async {
+    QuerySnapshot petsSnapshot = await _firestore.collection('pets').where('shelterId', isEqualTo: shelterId).get();
+    return petsSnapshot.docs.map((doc) => PetModel.fromFirebase(doc)).toList();
+  }
+
   Future<String> uploadProfilePic(File image, String uid) async {
     String fileName = 'profile_pics/$uid';
     await FirebaseStorage.instance.ref(fileName).putFile(image);
