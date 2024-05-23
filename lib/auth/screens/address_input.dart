@@ -40,9 +40,8 @@ final routeProvider = ChangeNotifierProvider<RouteNotifier>((ref) => RouteNotifi
 */
 // Main widget for the example
 class Example extends StatefulWidget {
-  const Example(this.initialPosition, {Key? key}) : super(key: key);
+  const Example({Key? key}) : super(key: key);
 
-  final LatLng initialPosition;
 
   @override
   State<Example> createState() => _ExampleState();
@@ -51,9 +50,8 @@ class Example extends StatefulWidget {
 class _ExampleState extends State<Example> {
   final geoMethods = GeoMethods(
     googleApiKey: 'AIzaSyAQfvXv9t3P6FsxWKDNU2eTlqsoSi4yK9Q',
-    language: 'en',
+    language: 'es',
     countryCode: 'mx',
-    countryCodes: ['us', 'es', 'co'],
     country: 'Mexico',
   );
   final controllerv = TextEditingController();
@@ -116,4 +114,7 @@ late final Address shelterLocation;
       ),
     );
   }
+}
+Coords? GiveAddress (Address shelterAddress){
+  return shelterAddress.coords;
 }

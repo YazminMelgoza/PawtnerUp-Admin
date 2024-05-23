@@ -142,27 +142,14 @@ class _RegisterFormState extends State<_RegisterForm> {
           ),
           const SizedBox(height: 15),
 
-          Column(
+          const Column(
           children: [
             SizedBox(
               height: 55, // Define a fixed height for the AddressInput
-              child:  FutureBuilder(
-              future: _getPosition(),
-              builder: (BuildContext context, AsyncSnapshot<LatLng> snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-              child: CircularProgressIndicator(),
-              );
-              } else {
-              if (snapshot.hasData) {
-              return Example(snapshot.data!);
-              } else {
-    return const Center(
-    child: Text('Location not found!'),
-    );
-    }}}),),
+              child: Example()
+              ),
 
-            const SizedBox(height: 15), // Space after AddressInput
+            SizedBox(height: 15), // Space after AddressInput
           ],
         ), // Add the address input widget here
           const SizedBox(height: 20),
@@ -241,27 +228,6 @@ class _RegisterFormState extends State<_RegisterForm> {
     return true;
   }
 }
-    Future<LatLng> _getPosition() async {
-    bool serviceEnabled;
-    LocationPermission permission;
 
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-    throw 'Location services are disabled';
-    }
 
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-    permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.denied) {
-    throw 'Location permissions are denied';
-    }
-    }
 
-    if (permission == LocationPermission.deniedForever) {
-    throw 'Location permissions are permanently denied, we cannot request permissions.';
-    }
-
-    Position position = await Geolocator.getCurrentPosition();
-    return LatLng(position.latitude, position.longitude);
-    }
