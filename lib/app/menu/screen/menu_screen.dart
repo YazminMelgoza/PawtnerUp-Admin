@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:pawtnerup_admin/app/menu/screen/Pet/add_pet.dart';
 import 'package:pawtnerup_admin/shared/shared.dart';
 import 'package:pawtnerup_admin/config/config.dart';
 //Location
@@ -32,22 +33,11 @@ class MenuScreen extends StatelessWidget {
         nameToShow = "$nameToShow $name";
       }
     } catch (e) {
-      nameToShow = "Ha ocurrido un problema, reinicia la aplicación";
+      nameToShow = "Hola Refugio!";
     }
 
     return Scaffold(
       // drawer: SideMenu(scaffoldKey: scaffoldKey),
-      appBar: AppBar(
-        title: Text(
-          nameToShow,
-          style: const TextStyle(
-            color: Colors.black,
-            fontSize: 20,
-          ),
-        ),
-        backgroundColor: AppColor.yellow,
-        actions: const [],
-      ),
       body: const _MenuView(),
     );
   }
@@ -104,7 +94,9 @@ class __MenuViewState extends State<_MenuView> {
                     child: CircularProgressIndicator(),
                   );
                 } else if (snapshot.hasError) {
+                  print(snapshot);
                   return Center(
+
                     child: Text('Error: ${snapshot.error}'),
                   );
                 } else if (!snapshot.hasData) {
@@ -206,6 +198,9 @@ class __MenuViewState extends State<_MenuView> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              SizedBox(
+                height: 60,
+              ),
               Padding(
                 padding: const EdgeInsets.only(top: 10),
                 child: Row(
@@ -242,20 +237,20 @@ class __MenuViewState extends State<_MenuView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Encuentra mascotas",
+                          "Tus",
                           style: TextStyle(
                             color: AppColor.textColor,
                             fontWeight: FontWeight.w900,
-                            fontSize: 25,
+                            fontSize: 40,
                             height: 1.0,
                           ),
                         ),
                         Text(
-                          "increibles",
+                          "mascotas",
                           style: TextStyle(
                             color: AppColor.yellowCustom,
                             fontWeight: FontWeight.w900,
-                            fontSize: 25,
+                            fontSize: 40,
                             height: 1.0,
                           ),
                         ),
@@ -270,7 +265,62 @@ class __MenuViewState extends State<_MenuView> {
             ],
           ),
         ),
+        Column(
+          children: [
+            SizedBox(
+              height: 110,
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // Your code here, like navigating to a new screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AddPet(
+                      key: UniqueKey(),
+                    ),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black, // Make ElevatedButton background transparent
+              ),
+              child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black, // Set button color here
+                    borderRadius: BorderRadius.circular(10.0), // Set desired corner roundness
+                    border: Border.all(color: Colors.black),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColor.shadowColor.withOpacity(0.1),
+                        spreadRadius: .5,
+                        blurRadius: .5,
+                        offset: const Offset(0, 1), // changes position of shadow
+                      ),
+                    ],
+                  ),
+                  height: 50.0,
+                  alignment: Alignment.center,
+                  child: Row(children: [
+                    Icon(
+                      Icons.pets,
+                      size: 30.0,
+                      color: Colors.white,
+                    ),
+                    Icon(
+                      Icons.add,
+                      size: 25.0,
+                      color: Colors.white,
+                    ),
+                  ],)
+
+              ),
+            ),
+          ],
+        )
+
       ],
     );
   }
 }
+
