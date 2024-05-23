@@ -35,7 +35,7 @@ class ShelterModel {
       'email': email,
       'website': website,
       'description': description,
-      'image': imageURL,
+      'imageURL': imageURL,
       'uid': uid,
       'address': address,
       'latitude': latitude,
