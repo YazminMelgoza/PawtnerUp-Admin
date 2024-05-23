@@ -16,6 +16,11 @@ class PetService {
     }
   }
 
+  Future<List<PetModel>> getPetsByShelterId(String shelterId) async {
+    QuerySnapshot petsSnapshot = await _firestore.collection('pets').where('shelterId', isEqualTo: shelterId).get();
+    return petsSnapshot.docs.map((doc) => PetModel.fromFirebase(doc)).toList();
+  }
+
   // Método para agregar una nueva mascota
   Future<void> addPet(PetModel pet) async {
     await _firestore.collection('pets').doc().set(pet.toMap());
