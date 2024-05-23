@@ -36,7 +36,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.6
   material_design_icons_flutter: 7.0.7296
-  flutter_riverpod: ^2.3.2
+  flutter_riverpod: ^1.0.4
   go_router: ^13.2.0
   google_fonts: 6.1.0
   sqflite: ^2.0.0+4
@@ -60,7 +60,8 @@ dependencies:
   image_picker: ^1.1.1
   firebase_storage: ^11.7.5
   relative_time: ^5.0.0
-
+  google_maps_flutter: ^2.1.0
+  address_search_field: ^5.0.3
 dev_dependencies:
   flutter_test:
     sdk: flutter
