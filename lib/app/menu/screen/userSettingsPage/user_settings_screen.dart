@@ -2,6 +2,8 @@
 // import 'package:pawtnerup_admin/app/utils/data.dart';
 // import 'package:pawtnerup_admin/services/firebase_service.dart';
 import 'package:flutter/material.dart';
+import 'package:pawtnerup_admin/models/shelter_model.dart';
+import 'package:pawtnerup_admin/services/shelter_service.dart';
 import 'package:pawtnerup_admin/shared/shared.dart';
 import 'package:pawtnerup_admin/config/config.dart';
 import 'package:go_router/go_router.dart';
@@ -18,7 +20,7 @@ class UserSettingsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Refugio '),
+        title: const Text('Perfil ', style: TextStyle(fontFamily: 'outfit'),),
         backgroundColor: AppColor.yellow,
         actions: [
           IconButton(onPressed: () {}, icon: const Icon(Icons.settings))
@@ -37,6 +39,20 @@ class _UserSettingsView extends StatefulWidget {
 }
 
 class __UserSettingsState extends State<_UserSettingsView> {
+  String getuid() {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      String userId = user.uid;
+      return userId;
+    } else {
+      return '';
+    }
+  }
+
+  Future<ShelterModel?> getShelter() {
+    return ShelterService().getShelterById(getuid());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -91,46 +107,61 @@ class __UserSettingsState extends State<_UserSettingsView> {
     );
   }
 
-  _buildBody() {
+  Widget _buildBody() {
     return FutureBuilder(
-      future: LoginGoogleUtils().isUserLoggedIn(),
-      builder: (context, snapshot) {
+      future: Future.wait([LoginGoogleUtils().isUserLoggedIn(), getShelter()]),
+      builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const CircularProgressIndicator();
         } else {
-          String? email        = FirebaseAuth.instance.currentUser?.email;
-          String? name         = FirebaseAuth.instance.currentUser?.displayName;
-          String? profilePhoto = FirebaseAuth.instance.currentUser?.photoURL;
-          // Future<List> users = getUser(email);
+          User? user = FirebaseAuth.instance.currentUser;
+          if (user != null) {
+            String userId = user.uid;
+            print('User ID: $userId');
+          } else {
+            print('User ID: ');
+          }
+          String? email = FirebaseAuth.instance.currentUser?.email;
+          String? name = FirebaseAuth.instance.currentUser?.displayName;
+          ShelterModel? shelter = snapshot.data?[1] as ShelterModel?;
+          String? profilePhoto = shelter?.imageURL;
+
           return SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.only(top: 0, bottom: 10),
               child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(name.toString()),
-                    colocarImagen(profilePhoto.toString()),
-                    Text(email.toString()),
-                    const SizedBox(
-                      height: 25,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(15, 0, 15, 25),
-                      child: CustomFilledButton(
-                        text: "Cerrar Sesión",
-                        buttonColor: AppColor.darker,
-                        onPressed: () async {
-                          await LoginGoogleUtils().signOutGoogle();
-                          await LoginGoogleUtils().singOutWithEmail();
-                          if (FirebaseAuth.instance.currentUser == null) {
-                            if (context.mounted) {
-                              context.go("/login");
-                            }
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(name.toString()),
+                  colocarImagen(profilePhoto.toString()),
+                  Text(email.toString()),
+                  if (shelter != null) ...[
+                    Text('Shelter Info:'),
+                    Text('Name: ${shelter.name}'),
+                    Text('Location: ${shelter.address}'),
+                    // Add more fields as needed
+                  ],
+                  const SizedBox(
+                    height: 25,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(15, 0, 15, 25),
+                    child: CustomFilledButton(
+                      text: "Cerrar Sesión",
+                      buttonColor: AppColor.darker,
+                      onPressed: () async {
+                        await LoginGoogleUtils().signOutGoogle();
+                        await LoginGoogleUtils().singOutWithEmail();
+                        if (FirebaseAuth.instance.currentUser == null) {
+                          if (context.mounted) {
+                            context.go("/login");
                           }
-                        },
-                      ),
+                        }
+                      },
                     ),
-                  ]),
+                  ),
+                ],
+              ),
             ),
           );
         }
@@ -138,6 +169,7 @@ class __UserSettingsState extends State<_UserSettingsView> {
     );
   }
 }
+
 
 colocarImagen(String url) {
   if (url == 'null') {

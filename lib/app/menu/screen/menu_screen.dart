@@ -94,7 +94,9 @@ class __MenuViewState extends State<_MenuView> {
                     child: CircularProgressIndicator(),
                   );
                 } else if (snapshot.hasError) {
+                  print(snapshot);
                   return Center(
+
                     child: Text('Error: ${snapshot.error}'),
                   );
                 } else if (!snapshot.hasData) {
