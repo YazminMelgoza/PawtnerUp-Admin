@@ -1,4 +1,7 @@
+import "dart:io";
+
 import "package:cloud_firestore/cloud_firestore.dart";
+import "package:firebase_storage/firebase_storage.dart";
 import "package:pawtnerup_admin/models/pet_model.dart";
 
 class PetService {
@@ -15,7 +18,11 @@ class PetService {
       return null;
     }
   }
-
+  Future<String> uploadProfilePic(File image, String uid) async {
+    String fileName = 'profile_pics/$uid';
+    await FirebaseStorage.instance.ref(fileName).putFile(image);
+    return await FirebaseStorage.instance.ref(fileName).getDownloadURL();
+  }
   // Método para agregar una nueva mascota
   Future<void> addPet(PetModel pet) async {
     await _firestore.collection('pets').doc().set(pet.toMap());

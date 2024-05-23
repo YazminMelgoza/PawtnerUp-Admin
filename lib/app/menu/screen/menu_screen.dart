@@ -197,7 +197,7 @@ class __MenuViewState extends State<_MenuView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(
-                height: 20,
+                height: 60,
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 10),
@@ -266,7 +266,7 @@ class __MenuViewState extends State<_MenuView> {
         Column(
           children: [
             SizedBox(
-              height: 30,
+              height: 110,
             ),
             ElevatedButton(
               onPressed: () {
