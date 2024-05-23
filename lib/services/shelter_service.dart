@@ -48,7 +48,7 @@ class ShelterService {
     return await FirebaseStorage.instance.ref(fileName).getDownloadURL();
   }
 
-  Future<ShelterModel> createUser(String username, String email, String password, File image) async {
+  Future<ShelterModel> createUser(String phone, String address, double? latitude, double? longitude, String description, String username, String email, String password, File? image) async {
   UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
     email: email,
     password: password,
@@ -57,14 +57,14 @@ class ShelterService {
     uid: userCredential.user!.uid,
     name: username,
     email: email,
-    phone: '',
-    address: '',
-    latitude: 0,
-    longitude: 0,
-    description: '',
-    imageURL: await uploadProfilePic(image, userCredential.user!.uid),
+    phone: phone,
+    address: address,
+    latitude: latitude,
+    longitude: longitude,
+    description: description,
+    imageURL: await uploadProfilePic(image!, userCredential.user!.uid),
   );
-  await _firestore.collection('users').doc(user.uid).set(user.toMap());
+  await _firestore.collection('shelters').doc(user.uid).set(user.toMap());
   return user;
   }
 
