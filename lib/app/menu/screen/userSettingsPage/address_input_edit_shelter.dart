@@ -7,7 +7,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-import '../../config/theme/color.dart';
+import '/../../../config/theme/color.dart';
 
 // Function to get the current position of the user
 /*Future<LatLng> _getPosition() async {
@@ -39,15 +39,15 @@ import '../../config/theme/color.dart';
 final routeProvider = ChangeNotifierProvider<RouteNotifier>((ref) => RouteNotifier());
 */
 // Main widget for the example
-class Example extends StatefulWidget {
-  const Example({Key? key, required this.onAddressSelected}) : super(key: key);
+class AddressInputEditShelter extends StatefulWidget {
+  const AddressInputEditShelter({Key? key, required this.onAddressSelected}) : super(key: key);
   final void Function(Address) onAddressSelected;
 
   @override
-  State<Example> createState() => _ExampleState();
+  State<AddressInputEditShelter> createState() => _AddressInputShelter();
 }
 
-class _ExampleState extends State<Example> {
+class _AddressInputShelter extends State<AddressInputEditShelter> {
   final geoMethods = GeoMethods(
     googleApiKey: 'AIzaSyAQfvXv9t3P6FsxWKDNU2eTlqsoSi4yK9Q',
     language: 'es',
@@ -60,7 +60,7 @@ class _ExampleState extends State<Example> {
   final markers = <Marker>{};
   final origCtrl = TextEditingController();
   final destCtrl = TextEditingController();
-late final Address shelterLocation;
+  late final Address shelterLocation;
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
@@ -73,11 +73,11 @@ late final Address shelterLocation;
 
     return Container(
       decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: const BorderRadius.only(
+          color: AppColor.appBgColor,
+          /*borderRadius: const BorderRadius.only(
               topLeft: borderRadius,
               bottomLeft: borderRadius,
-              bottomRight: borderRadius),
+              bottomRight: borderRadius),*/
           boxShadow: [
             BoxShadow(
                 color: Colors.black.withOpacity(0.06),
@@ -97,30 +97,14 @@ late final Address shelterLocation;
             )
         ),
         style: const TextStyle(fontSize: 16, color: Colors.black54),
-        decoration: InputDecoration(
-          floatingLabelStyle: const TextStyle(
-            color: AppColor.yellow,
-            fontWeight: FontWeight.bold,
-            fontSize: 15,
-          ),
-          enabledBorder: border,
-          focusedBorder: border,
-          errorBorder: border.copyWith(
-              borderSide: BorderSide(color: Colors.red.shade800)),
-          focusedErrorBorder: border.copyWith(
-              borderSide: BorderSide(color: Colors.red.shade800)),
-          isDense: true,
-          hintText: "Registre su ubicacion",
-          focusColor: colors.primary,
-        ),
+        decoration: const InputDecoration(labelText: 'Registre tu ubicacion'),
       ),
     );
   }
 }
-Coords? GiveAddress (Address shelterAddress){
+Coords? GiveAddressEdit (Address shelterAddress){
   return shelterAddress.coords;
 }
-
 
 
 
