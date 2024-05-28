@@ -2,23 +2,15 @@
 // import 'package:pawtnerup_admin/auth/db/sqlite.dart';
 import 'package:pawtnerup_admin/auth/screens/register_data.dart';
 import 'package:pawtnerup_admin/config/config.dart';
-import 'package:pawtnerup_admin/services/firebase_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pawtnerup_admin/shared/shared.dart';
-
-import 'package:firebase_auth/firebase_auth.dart';
-//Utils for Google Login
-import 'package:pawtnerup_admin/utils/login_google_utils.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-// util for picking image
 import 'package:pawtnerup_admin/utils/pick_image.dart';
-import 'package:pawtnerup_admin/utils/show_snack_bar.dart';
+import 'package:pawtnerup_admin/utils/snackbar.dart';
 import 'dart:io';
-import 'package:pawtnerup_admin/services/user_service.dart';
 
 // RegisterScreen
-import 'package:flutter/material.dart';
 
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
@@ -67,9 +59,9 @@ class RegisterScreen extends StatelessWidget {
                   ),                  Container(
                     height: MediaQuery.of(context).size.height - 300,
                     width: double.infinity,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.transparent,
-                      borderRadius: const BorderRadius.only(
+                      borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(100),
                       ),
                     ),
@@ -228,24 +220,28 @@ class _RegisterFormState extends State<_RegisterForm> {
   }
 
   bool areFieldsValid() {
+    if (image == null) {
+      showSnackbar(context, 'Por favor, selecciona una imagen');
+      return false;
+    }
     if (username.text.isEmpty) {
-      showSnackBar(context, 'Por favor, ingresa tu nombre');
+      showSnackbar(context, 'Por favor, ingresa tu nombre');
       return false;
     }
     if (email.text.isEmpty) {
-      showSnackBar(context, 'Por favor, ingresa tu correo');
+      showSnackbar(context, 'Por favor, ingresa tu correo');
       return false;
     }
     if (password.text.isEmpty) {
-      showSnackBar(context, 'Por favor, ingresa tu contraseña');
+      showSnackbar(context, 'Por favor, ingresa tu contraseña');
       return false;
     }
     if (confirmPassword.text.isEmpty) {
-      showSnackBar(context, 'Por favor, repite tu contraseña');
+      showSnackbar(context, 'Por favor, repite tu contraseña');
       return false;
     }
     if (password.text != confirmPassword.text) {
-      showSnackBar(context, 'Las contraseñas no coinciden');
+      showSnackbar(context, 'Las contraseñas no coinciden');
       return false;
     }
     return true;

@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:pawtnerup_admin/config/config.dart';
 import 'package:pawtnerup_admin/provider/auth_provider.dart';
 import 'package:pawtnerup_admin/services/shelter_service.dart';
-import 'package:pawtnerup_admin/services/user_service.dart';
 import 'package:provider/provider.dart';
 
 class SplashScreen extends StatefulWidget {

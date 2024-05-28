@@ -8,6 +8,12 @@ class ChatService {
   // Instancia de Firestore
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  Future<void> updateChatStatus(String chatId, String status) async {
+    await _firestore.collection('chats').doc(chatId).update({
+      'conversationStatus': status,
+    });
+  }
+
   // Método para obtener un chat por su ID
   Future<ChatModel?> getChatById(String chatId) async {
     DocumentSnapshot chatSnapshot =
