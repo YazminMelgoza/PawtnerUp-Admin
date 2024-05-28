@@ -123,6 +123,7 @@ class _RegisterFormState extends State<_RegisterForm> {
   Coords? selectedCoords; // Add this line
   late final String reference;
 
+
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
@@ -239,7 +240,7 @@ class _RegisterFormState extends State<_RegisterForm> {
                   );
                   if (context.mounted) context.go("/Root");
                 } catch (e) {
-                  if (context.mounted) showSnackBar(context, e.toString());
+                  if (context.mounted) showSnackbar(context, e.toString());
                 }
               },
             ),
@@ -264,7 +265,7 @@ class _RegisterFormState extends State<_RegisterForm> {
 
   bool areFieldsValid() {
     if (phone.text.isEmpty || website.text.isEmpty || adoptionFormURL.text.isEmpty) {
-      showSnackBar(context, 'Por favor, completa todos los campos');
+      showSnackbar(context, 'Por favor, completa todos los campos');
       return false;
     }
     return true;

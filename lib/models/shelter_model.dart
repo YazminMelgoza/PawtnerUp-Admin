@@ -4,7 +4,7 @@ class ShelterModel {
   String uid;
   String name;
   String phone;
-  String? email;
+  String email;
   String? website;
   String description;
   String imageURL;
@@ -17,7 +17,7 @@ class ShelterModel {
     required this.uid,
     required this.name,
     required this.phone,
-    this.email,
+    required this.email,
     this.website,
     required this.description,
     required this.imageURL,
@@ -46,7 +46,7 @@ class ShelterModel {
 
   // Método para crear un objeto de refugio desde un mapa
   factory ShelterModel.fromFirebase(DocumentSnapshot doc) {
-    Map<String, dynamic> map = doc.data() as Map<String, dynamic>;  
+    Map<String, dynamic> map = doc.data() as Map<String, dynamic>;
     return ShelterModel(
       name: map['name'],
       phone: map['phone'],
@@ -61,4 +61,27 @@ class ShelterModel {
       adoptionFormURL: map['adoptionFormURL'],
     );
   }
+
+  ShelterModel copyWith({
+    required String name,
+    required String address,
+    required String description,
+    String? website,
+    required ShelterModel shelter, required double latitude, required double longitude
+  }) {
+    return ShelterModel(
+      uid: shelter.uid,
+      name: name,
+      phone: shelter.phone,
+      email: shelter.email,
+      website: website ?? this.website,
+      description: description ?? this.description,
+      imageURL: shelter.imageURL,
+      address: address ?? this.address,
+      latitude: latitude,
+      longitude: longitude,
+      adoptionFormURL: shelter.adoptionFormURL,
+    );
+  }
+
 }
