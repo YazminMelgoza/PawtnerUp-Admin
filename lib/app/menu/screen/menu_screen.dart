@@ -190,113 +190,117 @@ class __MenuViewState extends State<_MenuView> {
   }
 
   Widget _buildAppBar(String location) {
-    return Column(
-      children:
-      [
-        SizedBox(height: 40),
-        Row(
-            children:
-            [
-              Row(
-                children: [
-                  const Icon(
-                    Icons.place_outlined,
-                    color: AppColor.labelColor,
-                    size: 30,
-                  ),
-                  const SizedBox(
-                    height: 10,
-                    width: 5,
-                  ),
-                  Text(
-                    location,
-                    style: const TextStyle(
-                      color: AppColor.textColor,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 16,
-                    ),
-                  ),
-                ],
-              ),
-            ]
-        ),
-        Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children:
-            [
-            Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+    return Padding(
+        padding: EdgeInsets.symmetric(horizontal: 10.0),
+        child:
+        Column(
+        children:
+        [
+          SizedBox(height: 40),
+          Row(
               children:
-                [
-                  Text(
-                    "Tus",
-                    style: TextStyle(
-                      color: AppColor.textColor,
-                      fontWeight: FontWeight.w900,
-                      fontSize: 40,
-                      height: 1.0,
+              [
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.place_outlined,
+                      color: AppColor.labelColor,
+                      size: 30,
                     ),
-                  ),
-                  Text(
-                    "mascotas",
-                    style: TextStyle(
-                      color: AppColor.yellowCustom,
-                      fontWeight: FontWeight.w900,
-                      fontSize: 40,
-                      height: 1.0,
+                    const SizedBox(
+                      height: 10,
+                      width: 5,
                     ),
-                  ),
-                ]
-            ),
-              ElevatedButton(
-                onPressed: () {
-                  // Your code here, like navigating to a new screen
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AddPet(
-                        key: UniqueKey(),
+                    Text(
+                      location,
+                      style: const TextStyle(
+                        color: AppColor.textColor,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16,
                       ),
                     ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black, // Make ElevatedButton background transparent
+                  ],
                 ),
-                child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.black, // Set button color here
-                      borderRadius: BorderRadius.circular(10.0), // Set desired corner roundness
-                      border: Border.all(color: Colors.black),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColor.shadowColor.withOpacity(0.1),
-                          spreadRadius: .5,
-                          blurRadius: .5,
-                          offset: const Offset(0, 1), // changes position of shadow
-                        ),
-                      ],
+              ]
+          ),
+          Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children:
+              [
+              Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                children:
+                  [
+                    Text(
+                      "Tus",
+                      style: TextStyle(
+                        color: AppColor.textColor,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 40,
+                        height: 1.0,
+                      ),
                     ),
-                    height: 50.0,
-                    alignment: Alignment.center,
-                    child: Row(children: [
-                      Icon(
-                        Icons.pets,
-                        size: 30.0,
-                        color: Colors.white,
+                    Text(
+                      "mascotas",
+                      style: TextStyle(
+                        color: AppColor.yellowCustom,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 40,
+                        height: 1.0,
                       ),
-                      Icon(
-                        Icons.add,
-                        size: 25.0,
-                        color: Colors.white,
-                      ),
-                    ],)
-
-                ),
+                    ),
+                  ]
               ),
-            ]
-        ),
-      ]
+                ElevatedButton(
+                  onPressed: () {
+                    // Your code here, like navigating to a new screen
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AddPet(
+                          key: UniqueKey(),
+                        ),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black, // Make ElevatedButton background transparent
+                  ),
+                  child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black, // Set button color here
+                        borderRadius: BorderRadius.circular(10.0), // Set desired corner roundness
+                        border: Border.all(color: Colors.black),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColor.shadowColor.withOpacity(0.1),
+                            spreadRadius: .5,
+                            blurRadius: .5,
+                            offset: const Offset(0, 1), // changes position of shadow
+                          ),
+                        ],
+                      ),
+                      height: 50.0,
+                      alignment: Alignment.center,
+                      child: Row(children: [
+                        Icon(
+                          Icons.pets,
+                          size: 30.0,
+                          color: Colors.white,
+                        ),
+                        Icon(
+                          Icons.add,
+                          size: 25.0,
+                          color: Colors.white,
+                        ),
+                      ],)
+
+                  ),
+                ),
+              ]
+          ),
+        ]
+      )
     );
   }
 }

@@ -92,22 +92,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       },
     ];
     return AppBar(
-      title: 
-      // show the name of the pet and the shelter in the appbar
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(widget.chatData.userName),
-          Text(widget.chatData.petName,
-          style: const TextStyle(
-            fontSize: 12,
-            color: Colors.grey)
-          ),
-        ],
-      )
-      ,
-      // show the pet image in the appbar and also the back button without overflow
-      leadingWidth: 150,
+      leadingWidth: 150,// show the pet image in the appbar and also the back button without overflow
       leading: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
@@ -128,12 +113,12 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               // go to the pet detail page
               PetModel? petModel = await PetService().getPetById(widget.chatData.petId);
               if (mounted) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => PetProfilePage(pet: petModel!, key: Key(petModel.id),)
-                ),
-              );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => PetProfilePage(pet: petModel!, key: Key(petModel.id),)
+                  ),
+                );
 
               }
             },
@@ -147,46 +132,45 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
             onPressed: () async {
               ShelterModel? shelterModel = await ShelterService().getShelterById(widget.chatData.shelterId);
               if (mounted) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ShelterDetailPage(shelter: shelterModel!)
-                ),
-              );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ShelterDetailPage(shelter: shelterModel!)
+                  ),
+                );
 
               }
             },
-            )
+          )
+        ],
+      ),
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(widget.chatData.userName),
+          Text(widget.chatData.petName,
+              style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.white
+              )
+          ),
         ],
       ),
       actions: [
-        // change the conversation status
-          DropdownButton(
-            items: options.map((option) {
-              return DropdownMenuItem(
-                value: option['value'],
-                child: Row(
-                  children: [
-                    Icon(option['icon'], color: option['color'], size: 20),
-                    const SizedBox(width: 5),
-                    Text(option['value']),
-                  ],
-                ),
-              );
-            }).toList(),
-            onChanged: (value) async {
-              if (value == null) return;
-              bool confirmation = await askConfirmationToContinue(context, '¿Estás seguro de que quieres cambiar el status de la conversación a $value?');
-              if (!confirmation) return;
-              chatService.updateChatStatus(widget.chatData.id, value.toString());
-              setState(() {
-                widget.chatData.conversationStatus = value.toString();
-              });
-            },
-            // style the dropdown button
-            
-          )
-        ],
+        IconButton(
+          icon: Icon(Icons.menu),
+          onPressed: () {
+            // Acción al presionar el ícono de configuración
+          },
+        ),
+      ],
+      backgroundColor: Colors.blue,
+      elevation: 4.0,
+      centerTitle: true,
+      iconTheme: IconThemeData(
+        color: Colors.white,
+      ),
+
     );
   }
 
