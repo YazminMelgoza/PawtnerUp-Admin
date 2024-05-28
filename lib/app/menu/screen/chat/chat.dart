@@ -13,6 +13,8 @@ import 'package:pawtnerup_admin/models/pet_model.dart';
 import 'package:pawtnerup_admin/models/shelter_model.dart';
 import 'package:pawtnerup_admin/services/pet_service.dart';
 import 'package:pawtnerup_admin/shared/widgets/custom_image.dart';
+import '../../../../shared/widgets/filter_box.dart';
+import '../../../utils/data.dart';
 import '../Pet/petprofile.dart';
 
 class ChatPage extends StatefulWidget {
@@ -27,8 +29,27 @@ class _ChatPageState extends State<ChatPage> {
   final ChatService _chatService = ChatService();
   List<ChatModel> chats = [];
   List<ChatModel> filteredChats = [];
+  List<ChatModel> filteredChatsAux = [];
   final TextEditingController _searchController = TextEditingController();
+  List<Map<String, dynamic>> optionsChats = [
+    {
+      'value': 'EN CURSO',
+      'color': Colors.blue,
+      'icon': Icons.access_time,
+    },
+    {
+      'value': 'FINALIZADO',
+      'color': Colors.green,
+      'icon': Icons.check,
+    },
 
+    {
+      'value': 'CANCELADO',
+      'color': Colors.red,
+      'icon': Icons.cancel,
+    },
+  ];
+  int _selectedCategory = 0;
   @override
   void initState() {
     super.initState();
@@ -36,15 +57,25 @@ class _ChatPageState extends State<ChatPage> {
     _searchController.addListener(() {
       updateFilteredChats(_searchController.text);
     });
+
   }
 
   Future<void> _loadChats() async {
+
     User? currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser != null) {
       _chatService.getChatsByUserIdStream(currentUser.uid).listen((data) {
         setState(() {
           chats = data;
-          filteredChats = chats;
+          if (_selectedCategory == 0) {
+            filteredChats = chats.where((pet) => pet.conversationStatus == 'EN CURSO').toList();
+
+          } else if (_selectedCategory == 1) {
+            filteredChats = chats.where((pet) => pet.conversationStatus == 'FINALIZADO').toList();;
+          } else if (_selectedCategory == 2) {
+            filteredChats = chats.where((pet) => pet.conversationStatus == 'CANCELADO').toList();;
+          }
+          filteredChatsAux = filteredChats;
         });
       });
     }
@@ -53,9 +84,17 @@ class _ChatPageState extends State<ChatPage> {
   void updateFilteredChats(String query) {
     setState(() {
       if (query.isEmpty) {
-        filteredChats = chats;
+        if (_selectedCategory == 0) {
+          filteredChats = chats.where((pet) => pet.conversationStatus == 'EN CURSO').toList();
+
+        } else if (_selectedCategory == 1) {
+          filteredChats = chats.where((pet) => pet.conversationStatus == 'FINALIZADO').toList();;
+        } else if (_selectedCategory == 2) {
+          filteredChats = chats.where((pet) => pet.conversationStatus == 'CANCELADO').toList();;
+        }
+        filteredChatsAux = filteredChats;
       } else {
-        filteredChats = chats.where((chat) => isQueryRelatedToChat(chat, query)).toList();
+        filteredChats = filteredChatsAux.where((chat) => isQueryRelatedToChat(chat, query)).toList();
       }
     });
   }
@@ -91,6 +130,40 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
+  Widget _categoriesWidget() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(
+        optionsChats.length,
+            (index) => Padding(
+          padding: const EdgeInsets.symmetric(
+              vertical: 8.0), // Espaciado vertical entre elementos
+          child: FilterItem(
+            data: optionsChats[index],
+            selected: index == _selectedCategory,
+            onTap: () {
+              setState(() {
+                _selectedCategory = index;
+                if (_selectedCategory == 0) {
+                  filteredChats = chats.where((pet) => pet.conversationStatus == 'EN CURSO').toList();
+
+                } else if (_selectedCategory == 1) {
+                  filteredChats = chats.where((pet) => pet.conversationStatus == 'FINALIZADO').toList();;
+                } else if (_selectedCategory == 2) {
+                  filteredChats = chats.where((pet) => pet.conversationStatus == 'CANCELADO').toList();;
+                }
+                filteredChatsAux = filteredChats;
+                updateFilteredChats(_searchController.text);
+
+              });
+
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildHeader() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(15, 60, 15, 5),
@@ -111,6 +184,7 @@ class _ChatPageState extends State<ChatPage> {
             readOnly: false,
             prefix: const Icon(Icons.search, color: Colors.grey),
           ),
+          _categoriesWidget(),
         ],
       ),
     );

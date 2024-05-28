@@ -16,6 +16,7 @@ import 'package:pawtnerup_admin/services/shelter_service.dart';
 import 'package:pawtnerup_admin/utils/ask_confirmation_to_continue.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:pawtnerup_admin/services/pet_service.dart';
 
 class ChatDetailPage extends StatefulWidget {
   const ChatDetailPage({super.key, required this.chatData});
@@ -76,17 +77,17 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
 
     List<Map<String, dynamic>> options = [
       {
-        'value': 'finalizado',
+        'value': 'FINALIZADO',
         'color': Colors.green,
         'icon': Icons.check,
       },
       {
-        'value': 'en curso',
+        'value': 'EN CURSO',
         'color': Colors.blue,
         'icon': Icons.access_time,
       },
       {
-        'value': 'cancelado',
+        'value': 'CANCELADO',
         'color': Colors.red,
         'icon': Icons.cancel,
       },
@@ -147,30 +148,91 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(widget.chatData.userName),
+          Text(widget.chatData.userName ,
+              style: const TextStyle(
+                  color: Colors.white
+              )
+          ),
           Text(widget.chatData.petName,
               style: const TextStyle(
                   fontSize: 12,
-                  color: Colors.white
+                  color: Colors.white70
               )
           ),
         ],
       ),
+
       actions: [
-        IconButton(
-          icon: Icon(Icons.menu),
-          onPressed: () {
-            // Acción al presionar el ícono de configuración
+        PopupMenuButton<String>(
+          icon: (widget.chatData.conversationStatus == "EN CURSO")?
+          Icon(Icons.access_time):
+          (widget.chatData.conversationStatus == "FINALIZADO")?
+          Icon(Icons.check):
+          Icon(Icons.cancel),
+          onSelected: (selectedValue) async {
+            bool confirmation = true;
+            if(selectedValue=="FINALIZADO")
+            {
+              PetModel? newPet = await PetService().getPetById(widget.chatData.petId);
+              if (newPet != null) {
+                var adoptionStatus = newPet.adoptionStatus;
+                if(adoptionStatus == 'available')
+                {
+                  confirmation = await askConfirmationToContinue(context,
+                      '¿Desea confirmar la adopción de esta mascota?, la mascota ya no aparecerá disponible en su perfil...'
+                  );
+                  if (!confirmation) return;
+                  PetService().adoptPet(widget.chatData.petId);
+                }else
+                {
+                  confirmation = await askConfirmationToContinue(context,
+                      'Lo siento, esta mascota no está disponible para adopción, revise el perfil de su mascota'
+                  );
+                  confirmation = false;
+                }
+              } else {
+                confirmation = await askConfirmationToContinue(context,
+                    'Lo siento, sucedió un error, contacte a soporte técnico'
+                );
+                confirmation = false;
+              }
+
+
+            }else
+            {
+              confirmation = await askConfirmationToContinue(context,
+                  '¿Desea cambiar el estatus de esta adopción?'
+              );
+            }
+            if (!confirmation) return;
+            chatService.updateChatStatus(widget.chatData.id, selectedValue);
+            setState(() {
+              widget.chatData.conversationStatus = selectedValue;
+            });
+          },
+          itemBuilder: (BuildContext context) {
+            return options.map((option) {
+              return PopupMenuItem<String>(
+                value: option['value'],
+                child: Row(
+                  children: [
+                    Icon(option['icon'], color: option['color'], size: 20),
+                    const SizedBox(width: 5),
+                    Text(option['value']),
+                  ],
+                ),
+              );
+            }).toList();
           },
         ),
-      ],
-      backgroundColor: Colors.blue,
-      elevation: 4.0,
-      centerTitle: true,
-      iconTheme: IconThemeData(
-        color: Colors.white,
-      ),
 
+      ],
+        backgroundColor: Colors.blue,
+        elevation: 4.0,
+        centerTitle: true,
+        iconTheme: IconThemeData(
+          color: Colors.white,
+      ),
     );
   }
 
