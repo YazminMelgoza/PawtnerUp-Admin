@@ -16,6 +16,7 @@ import 'package:pawtnerup_admin/services/shelter_service.dart';
 import 'package:pawtnerup_admin/utils/ask_confirmation_to_continue.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:pawtnerup_admin/services/pet_service.dart';
 
 class ChatDetailPage extends StatefulWidget {
   const ChatDetailPage({super.key, required this.chatData});
@@ -76,38 +77,23 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
 
     List<Map<String, dynamic>> options = [
       {
-        'value': 'finalizado',
+        'value': 'FINALIZADO',
         'color': Colors.green,
         'icon': Icons.check,
       },
       {
-        'value': 'en curso',
+        'value': 'EN CURSO',
         'color': Colors.blue,
         'icon': Icons.access_time,
       },
       {
-        'value': 'cancelado',
+        'value': 'CANCELADO',
         'color': Colors.red,
         'icon': Icons.cancel,
       },
     ];
     return AppBar(
-      title: 
-      // show the name of the pet and the shelter in the appbar
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(widget.chatData.userName),
-          Text(widget.chatData.petName,
-          style: const TextStyle(
-            fontSize: 12,
-            color: Colors.grey)
-          ),
-        ],
-      )
-      ,
-      // show the pet image in the appbar and also the back button without overflow
-      leadingWidth: 150,
+      leadingWidth: 150,// show the pet image in the appbar and also the back button without overflow
       leading: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
@@ -128,12 +114,12 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               // go to the pet detail page
               PetModel? petModel = await PetService().getPetById(widget.chatData.petId);
               if (mounted) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => PetProfilePage(pet: petModel!, key: Key(petModel.id),)
-                ),
-              );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => PetProfilePage(pet: petModel!, key: Key(petModel.id),)
+                  ),
+                );
 
               }
             },
@@ -147,23 +133,86 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
             onPressed: () async {
               ShelterModel? shelterModel = await ShelterService().getShelterById(widget.chatData.shelterId);
               if (mounted) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ShelterDetailPage(shelter: shelterModel!)
-                ),
-              );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ShelterDetailPage(shelter: shelterModel!)
+                  ),
+                );
 
               }
             },
-            )
+          )
         ],
       ),
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(widget.chatData.userName ,
+              style: const TextStyle(
+                  color: Colors.white
+              )
+          ),
+          Text(widget.chatData.petName,
+              style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.white70
+              )
+          ),
+        ],
+      ),
+
       actions: [
-        // change the conversation status
-          DropdownButton(
-            items: options.map((option) {
-              return DropdownMenuItem(
+        PopupMenuButton<String>(
+          icon: (widget.chatData.conversationStatus == "EN CURSO")?
+          Icon(Icons.access_time):
+          (widget.chatData.conversationStatus == "FINALIZADO")?
+          Icon(Icons.check):
+          Icon(Icons.cancel),
+          onSelected: (selectedValue) async {
+            bool confirmation = true;
+            if(selectedValue=="FINALIZADO")
+            {
+              PetModel? newPet = await PetService().getPetById(widget.chatData.petId);
+              if (newPet != null) {
+                var adoptionStatus = newPet.adoptionStatus;
+                if(adoptionStatus == 'available')
+                {
+                  confirmation = await askConfirmationToContinue(context,
+                      '¿Desea confirmar la adopción de esta mascota?, la mascota ya no aparecerá disponible en su perfil...'
+                  );
+                  if (!confirmation) return;
+                  PetService().adoptPet(widget.chatData.petId);
+                }else
+                {
+                  confirmation = await askConfirmationToContinue(context,
+                      'Lo siento, esta mascota no está disponible para adopción, revise el perfil de su mascota'
+                  );
+                  confirmation = false;
+                }
+              } else {
+                confirmation = await askConfirmationToContinue(context,
+                    'Lo siento, sucedió un error, contacte a soporte técnico'
+                );
+                confirmation = false;
+              }
+
+
+            }else
+            {
+              confirmation = await askConfirmationToContinue(context,
+                  '¿Desea cambiar el estatus de esta adopción?'
+              );
+            }
+            if (!confirmation) return;
+            chatService.updateChatStatus(widget.chatData.id, selectedValue);
+            setState(() {
+              widget.chatData.conversationStatus = selectedValue;
+            });
+          },
+          itemBuilder: (BuildContext context) {
+            return options.map((option) {
+              return PopupMenuItem<String>(
                 value: option['value'],
                 child: Row(
                   children: [
@@ -173,20 +222,17 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                   ],
                 ),
               );
-            }).toList(),
-            onChanged: (value) async {
-              if (value == null) return;
-              bool confirmation = await askConfirmationToContinue(context, '¿Estás seguro de que quieres cambiar el status de la conversación a $value?');
-              if (!confirmation) return;
-              chatService.updateChatStatus(widget.chatData.id, value.toString());
-              setState(() {
-                widget.chatData.conversationStatus = value.toString();
-              });
-            },
-            // style the dropdown button
-            
-          )
-        ],
+            }).toList();
+          },
+        ),
+
+      ],
+        backgroundColor: Colors.blue,
+        elevation: 4.0,
+        centerTitle: true,
+        iconTheme: IconThemeData(
+          color: Colors.white,
+      ),
     );
   }
 
