@@ -164,7 +164,7 @@ class __UserSettingsState extends State<_UserSettingsView> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        "Sitio Web/Link de Adopcion",
+                        "Sitio Web",
                         style: TextStyle(
                             fontFamily: 'outfit',
                             fontSize: 16,
