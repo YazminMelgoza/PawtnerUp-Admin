@@ -45,8 +45,8 @@ class FilterItem extends StatelessWidget {
             (data["value"] == "EN CURSO")?
             Icon(Icons.access_time,
               color: Colors.blue,):
-            (data["value"]== "FINALIZADO")?
-            Icon(Icons.check,
+            (data["value"]== "ADOPTADO")?
+            Icon(Icons.pets,
               color: Colors.green,):
             Icon(Icons.cancel,
               color: Colors.red,),

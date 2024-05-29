@@ -24,7 +24,7 @@ class ChatPage extends StatefulWidget {
   State<ChatPage> createState() => _ChatPageState();
 }
 
-// TODO> ORDENAR CHATS POR FECHA DE ÚLTIMO MENSAJE
+
 class _ChatPageState extends State<ChatPage> {
   final ChatService _chatService = ChatService();
   List<ChatModel> chats = [];
@@ -38,9 +38,9 @@ class _ChatPageState extends State<ChatPage> {
       'icon': Icons.access_time,
     },
     {
-      'value': 'FINALIZADO',
+      'value': 'ADOPTADO',
       'color': Colors.green,
-      'icon': Icons.check,
+      'icon': Icons.pets,
     },
 
     {
@@ -71,7 +71,7 @@ class _ChatPageState extends State<ChatPage> {
             filteredChats = chats.where((pet) => pet.conversationStatus == 'EN CURSO').toList();
 
           } else if (_selectedCategory == 1) {
-            filteredChats = chats.where((pet) => pet.conversationStatus == 'FINALIZADO').toList();;
+            filteredChats = chats.where((pet) => pet.conversationStatus == 'ADOPTADO').toList();;
           } else if (_selectedCategory == 2) {
             filteredChats = chats.where((pet) => pet.conversationStatus == 'CANCELADO').toList();;
           }
@@ -88,7 +88,7 @@ class _ChatPageState extends State<ChatPage> {
           filteredChats = chats.where((pet) => pet.conversationStatus == 'EN CURSO').toList();
 
         } else if (_selectedCategory == 1) {
-          filteredChats = chats.where((pet) => pet.conversationStatus == 'FINALIZADO').toList();;
+          filteredChats = chats.where((pet) => pet.conversationStatus == 'ADOPTADO').toList();;
         } else if (_selectedCategory == 2) {
           filteredChats = chats.where((pet) => pet.conversationStatus == 'CANCELADO').toList();;
         }
@@ -148,7 +148,7 @@ class _ChatPageState extends State<ChatPage> {
                   filteredChats = chats.where((pet) => pet.conversationStatus == 'EN CURSO').toList();
 
                 } else if (_selectedCategory == 1) {
-                  filteredChats = chats.where((pet) => pet.conversationStatus == 'FINALIZADO').toList();;
+                  filteredChats = chats.where((pet) => pet.conversationStatus == 'ADOPTADO').toList();;
                 } else if (_selectedCategory == 2) {
                   filteredChats = chats.where((pet) => pet.conversationStatus == 'CANCELADO').toList();;
                 }

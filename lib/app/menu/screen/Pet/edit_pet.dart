@@ -809,9 +809,7 @@ class _AddPetState extends State<EditPet> {
                     text: 'Guardar Cambios',
                     buttonColor: Color(0xFFFF8D00),
                     icon: MdiIcons.fromString("paw"),
-
                     onPressed: () async {
-
                       if(_uploadedPhotos.isEmpty)
                       {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -878,8 +876,21 @@ class _AddPetState extends State<EditPet> {
                         );
                         return;
                       }
-
-
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            content: Row(
+                              children: [
+                                CircularProgressIndicator(),
+                                SizedBox(width: 20),
+                                Text("Guardando información..."),
+                              ],
+                            ),
+                          );
+                        },
+                        barrierDismissible: false,
+                      );
                       PetModel newPet = PetModel(
                         id: widget.pet.id,
                         name: name.text,
@@ -905,6 +916,7 @@ class _AddPetState extends State<EditPet> {
                         );
                         Navigator.pop(context);
                         Navigator.pop(context);
+                        Navigator.pop(context);
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -915,10 +927,8 @@ class _AddPetState extends State<EditPet> {
                           ),
                         );
 
-
-
                       }catch (error) {
-                        // Handle other non-Firebase errors
+                        Navigator.pop(context);
                         print(error); // Log the error for debugging
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(

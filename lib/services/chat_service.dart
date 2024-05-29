@@ -80,6 +80,17 @@ class ChatService {
       });
     }
   }
+  Future<void> cancelAllChatsById(String petId) async {
+    CollectionReference chatsCollection = FirebaseFirestore.instance.collection('chats');
+    QuerySnapshot querySnapshot = await chatsCollection.where('petId', isEqualTo: petId).get();
+
+    for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+      await doc.reference.update({
+        'conversationStatus': "CANCELADO",
+
+      });
+    }
+  }
 
   // Método para revisar si existe un chat entre dos usuarios y una mascota
   Future<ChatModel?> checkChat(String userId, String shelterId, String petId) async {

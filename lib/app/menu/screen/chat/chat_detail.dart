@@ -77,9 +77,9 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
 
     List<Map<String, dynamic>> options = [
       {
-        'value': 'FINALIZADO',
+        'value': 'ADOPTADO',
         'color': Colors.green,
-        'icon': Icons.check,
+        'icon': Icons.pets,
       },
       {
         'value': 'EN CURSO',
@@ -166,23 +166,83 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
         PopupMenuButton<String>(
           icon: (widget.chatData.conversationStatus == "EN CURSO")?
           Icon(Icons.access_time):
-          (widget.chatData.conversationStatus == "FINALIZADO")?
+          (widget.chatData.conversationStatus == "ADOPTADO")?
           Icon(Icons.check):
           Icon(Icons.cancel),
           onSelected: (selectedValue) async {
+            if(widget.chatData.conversationStatus=="ADOPTADO"){return;}
             bool confirmation = true;
-            if(selectedValue=="FINALIZADO")
+            PetModel? newPet = null;
+            try
             {
-              PetModel? newPet = await PetService().getPetById(widget.chatData.petId);
-              if (newPet != null) {
-                var adoptionStatus = newPet.adoptionStatus;
+              newPet = await PetService().getPetById(widget.chatData.petId);
+            }catch(e)
+            {
+              /*confirmation = await askConfirmationToContinue(context,
+                  "Ha ocurrido un error inesperado. Inténtalo de nuevo más tarde."
+              );
+              confirmation = false;
+              return;*/
+            }
+            if(newPet==null)
+            {
+              confirmation = await askConfirmationToContinue(context,
+                  'Lo siento, la mascota asociada a este chat ya no está disponible'
+              );
+              confirmation = false;
+              return;
+            }
+            var adoptionStatus = newPet.adoptionStatus;
+
+            if(selectedValue=="ADOPTADO")
+            {
                 if(adoptionStatus == 'available')
                 {
                   confirmation = await askConfirmationToContinue(context,
-                      '¿Desea confirmar la adopción de esta mascota?, la mascota ya no aparecerá disponible en su perfil...'
+                      '¿Estás seguro de que deseas marcar como adoptado a esta mascota y cancelar todos los chats en proceso?, esta acción es irreversible'
                   );
                   if (!confirmation) return;
-                  PetService().adoptPet(widget.chatData.petId);
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        content: Row(
+                          children: [
+                            CircularProgressIndicator(),
+                            SizedBox(width: 20),
+                            Text("Procesando Adopción..."),
+                          ],
+                        ),
+                      );
+                    },
+                    barrierDismissible: false,
+                  );
+                  try {
+                    await PetService().adoptPet(widget.chatData.petId);
+                    await ChatService().cancelAllChatsById(widget.chatData.petId);
+                    if (!confirmation) return;
+                    chatService.updateChatStatus(widget.chatData.id, selectedValue);
+                    setState(() {
+                      widget.chatData.conversationStatus = selectedValue;
+                    });
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+                  }catch (error) {
+                    Navigator.pop(context);
+                    print(error);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          "Ha ocurrido un error inesperado. Inténtalo de nuevo más tarde.",
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.red,
+                          ),
+                        ),
+                      ),
+                    );
+                  }
                 }else
                 {
                   confirmation = await askConfirmationToContinue(context,
@@ -190,14 +250,20 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                   );
                   confirmation = false;
                 }
-              } else {
+            }else if (selectedValue=="EN CURSO")
+            {
+              if(adoptionStatus == 'available')
+              {
                 confirmation = await askConfirmationToContinue(context,
-                    'Lo siento, sucedió un error, contacte a soporte técnico'
+                    '¿Desea cambiar el estatus de esta adopción?'
+                );
+              } else
+              {
+                confirmation = await askConfirmationToContinue(context,
+                    'Lo siento, esta mascota no está disponible para adopción, revise el perfil de su mascota'
                 );
                 confirmation = false;
               }
-
-
             }else
             {
               confirmation = await askConfirmationToContinue(context,
