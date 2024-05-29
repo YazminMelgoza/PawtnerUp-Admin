@@ -23,7 +23,7 @@ class _EditScreenState extends State<EditScreen> {
   late TextEditingController _descriptionController;
   late TextEditingController _websiteController;
   late TextEditingController _nameController;
-  Address? selectedAddress; // Add this line
+  Address? selectedAddress ; // Add this line
   Coords? selectedCoords; // Add this line
   late final String reference;
 
@@ -47,10 +47,10 @@ class _EditScreenState extends State<EditScreen> {
     if (_formKey.currentState!.validate()) {
       // Create an updated ShelterModel
       ShelterModel updatedShelter = widget.shelter.copyWith(
-        address: selectedAddress?.reference ?? '',
+        address: selectedAddress?.reference ?? widget.shelter.address,
         description: _descriptionController.text,
-        website: _websiteController.text, name: _nameController.text, shelter: widget.shelter,
-        latitude: selectedCoords!.latitude, longitude: selectedCoords!.longitude
+        website: _websiteController.text , shelter: widget.shelter,
+        latitude: selectedCoords?.latitude ?? widget.shelter.latitude, longitude: selectedCoords?.longitude ?? widget.shelter.longitude
       );
 
       // Call a service to update the shelter data
@@ -85,6 +85,7 @@ class _EditScreenState extends State<EditScreen> {
 
                 height: 55,
                 child: AddressInputEditShelter(
+                  widget.shelter,
                   onAddressSelected: (Address address) {
                     setState(() {
                       selectedAddress = address;

@@ -63,15 +63,14 @@ class ShelterModel {
   }
 
   ShelterModel copyWith({
-    required String name,
     required String address,
     required String description,
     String? website,
-    required ShelterModel shelter, required double latitude, required double longitude
+    required ShelterModel shelter, required double? latitude, required double? longitude
   }) {
     return ShelterModel(
       uid: shelter.uid,
-      name: name,
+      name: shelter.name,
       phone: shelter.phone,
       email: shelter.email,
       website: website ?? this.website,
