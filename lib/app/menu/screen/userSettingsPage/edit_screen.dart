@@ -22,6 +22,8 @@ class _EditScreenState extends State<EditScreen> {
   late TextEditingController _addressController;
   late TextEditingController _descriptionController;
   late TextEditingController _websiteController;
+  late TextEditingController _linkadopcionController;
+
   late TextEditingController _nameController;
   Address? selectedAddress ; // Add this line
   Coords? selectedCoords; // Add this line
@@ -33,6 +35,7 @@ class _EditScreenState extends State<EditScreen> {
     _addressController = TextEditingController(text: widget.shelter.address);
     _descriptionController = TextEditingController(text: widget.shelter.description);
     _websiteController = TextEditingController(text: widget.shelter.website);
+    _linkadopcionController = TextEditingController(text: widget.shelter.adoptionFormURL);
   }
 
   @override
@@ -40,6 +43,7 @@ class _EditScreenState extends State<EditScreen> {
     _addressController.dispose();
     _descriptionController.dispose();
     _websiteController.dispose();
+    _linkadopcionController.dispose();
     super.dispose();
   }
 
@@ -49,7 +53,9 @@ class _EditScreenState extends State<EditScreen> {
       ShelterModel updatedShelter = widget.shelter.copyWith(
         address: selectedAddress?.reference ?? widget.shelter.address,
         description: _descriptionController.text,
-        website: _websiteController.text , shelter: widget.shelter,
+        website: _websiteController.text ,
+          linkadopcion: _linkadopcionController.text,
+          shelter: widget.shelter,
         latitude: selectedCoords?.latitude ?? widget.shelter.latitude, longitude: selectedCoords?.longitude ?? widget.shelter.longitude
       );
 
@@ -109,13 +115,24 @@ class _EditScreenState extends State<EditScreen> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _websiteController,
-                decoration: const InputDecoration(labelText: 'Website/Link de Adopcion'),
-                validator: (value) {
+                decoration: const InputDecoration(labelText: 'Website'),
+                /*validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a website/link';
                   }
                   return null;
-                },
+                },*/
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _linkadopcionController,
+                decoration: const InputDecoration(labelText: 'Link de Adopcion'),
+                /*validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a website/link';
+                  }
+                  return null;
+                },*/
               ),
             ],
           ),

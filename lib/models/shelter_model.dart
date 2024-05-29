@@ -66,6 +66,7 @@ class ShelterModel {
     required String address,
     required String description,
     String? website,
+    String? linkadopcion,
     required ShelterModel shelter, required double? latitude, required double? longitude
   }) {
     return ShelterModel(
@@ -79,7 +80,7 @@ class ShelterModel {
       address: address ?? this.address,
       latitude: latitude,
       longitude: longitude,
-      adoptionFormURL: shelter.adoptionFormURL,
+      adoptionFormURL: linkadopcion,
     );
   }
 
