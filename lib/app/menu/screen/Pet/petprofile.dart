@@ -18,6 +18,7 @@ import '../../../../shared/widgets/custom_image.dart';
 import '../../../../utils/location_utils.dart';
 import '../chat/chat.dart';
 import '../chat/chat_detail.dart';
+import 'edit_pet.dart';
 
 class PetProfilePage extends StatefulWidget {
   final PetModel pet;
@@ -117,40 +118,54 @@ class _PetProfilePageState extends State<PetProfilePage> {
                     child: Column(
                       children: [
                         Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // Primer elemento (3/4 del espacio)
+                            Expanded(
+                              flex: 4, // 3 partes de 4
+                              child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     widget.pet.name ,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
                                       fontSize: 30,
                                       fontWeight: FontWeight.bold,
-                                      color: Color.fromRGBO(11, 96, 151, 1),
+                                      color: Color(0xFFFF8D00),
                                     ),
                                   ),
                                 ],
                               ),
-                              Row(
+                            ),
+                            // Segundo elemento (1/4 del espacio)
+                            Expanded(
+                              flex: 2, // 1 parte de 4
+                              child: Row(
                                 children: [
                                   Icon(
                                     Icons.location_on, // Icono de ubicación
-                                    color: Color.fromRGBO(11, 96, 151, 1), // Color azul personalizado
+                                    color: Color(0xFFFF8D00),
                                   ),
                                   Text(
-                                    (providerBool == 3)?LocationUtils().calcularKilometros(shelter.latitude!, shelter.longitude!, lp.location!.ubicacion!.latitude,lp.location!.ubicacion!.longitude):"NA",
+                                    (providerBool == 3)
+                                        ? LocationUtils().calcularKilometros(shelter.latitude!, shelter.longitude!, lp.location!.ubicacion!.latitude, lp.location!.ubicacion!.longitude)
+                                        : "NA" ,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,
-                                      color: Color.fromRGBO(11, 96, 151, 1), // Color azul personalizado
+                                      color: Color(0xFFFFBC00),
                                     ),
                                   ),
-
                                 ],
                               ),
-                            ]
+                            ),
+                          ],
                         ),
+
                         const SizedBox(height: 20),
                         SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
@@ -273,13 +288,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
                             Expanded(
                               child: GestureDetector(
                                 onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          ShelterDetailPage(shelter: shelter),
-                                    ),
-                                  );
+
                                 },
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
@@ -329,20 +338,21 @@ class _PetProfilePageState extends State<PetProfilePage> {
                           width: double.infinity,
                           child: ElevatedButton.icon(
                             onPressed: () async {
-                              goToChat(
-                                context: context,
-                                chatService: _chatService,
-                                shelter: shelter,
-                                pet: widget.pet,
-                                user: FirebaseAuth.instance.currentUser!,
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => EditPet(
+                                          pet: widget.pet
+                                      )
+                                  )
                               );
                             },
                             icon: const Icon(
-                              Icons.chat,
+                              Icons.insert_drive_file,
                               color: Colors.white,
                             ),
                             label: const Text(
-                              'Adoptame',
+                              'Editar información',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 16.0,
@@ -350,7 +360,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
                               ),
                             ),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color.fromRGBO(11, 96, 151, .7),
+                              backgroundColor: const Color(0xFFFF8D00),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(50.0),
                               ),
@@ -450,7 +460,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
             style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Color.fromRGBO(11, 96, 151, .99),
+              color: Color(0xFFFFBC00),
             ),
             textAlign: TextAlign.center,
           ),
@@ -495,7 +505,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
             style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Color.fromRGBO(11, 96, 151, .99),
+              color: Color(0xFFFFBC00),
             ),
             textAlign: TextAlign.center,
           ),

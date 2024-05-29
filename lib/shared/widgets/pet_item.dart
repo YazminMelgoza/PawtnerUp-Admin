@@ -59,18 +59,27 @@ class PetItem extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(10, 0, 10, 5),
               child: Column(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        data['name'],
-                        style: const TextStyle(
-                          fontSize: 18,
-                          color: Color(0xFFFF8D00),
-                          fontWeight: FontWeight.bold,
-                        ),
+                Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: Text(
+                      data['name'],
+                      style: const TextStyle(
+                        fontSize: 18,
+                        color: Color(0xFFFF8D00),
+                        fontWeight: FontWeight.bold,
                       ),
-                      (data['sex'] == "male")
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: (data['sex'] == "male")
                           ? const Icon(
                         Icons.male,
                         size: 25,
@@ -81,9 +90,12 @@ class PetItem extends StatelessWidget {
                         size: 25,
                         color: Colors.black,
                       ),
-                    ],
+                    ),
                   ),
-                  Row(
+                ],
+              ),
+
+              Row(
                     children: [
                       const Text(
                         "Edad: ",

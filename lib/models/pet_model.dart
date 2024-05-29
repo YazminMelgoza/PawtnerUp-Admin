@@ -73,4 +73,26 @@ class PetModel {
       publishedAt: map['publishedAt'],
     );
   }
+
+  factory PetModel.fromMap(Map<String, dynamic> map) {
+    //Map<String, dynamic> map = doc.data() as Map<String, dynamic>;
+    return PetModel(
+      id: map['id'],
+      name: map['name'],
+      type: map['type'],
+      sex: map['sex'],
+      ageInYears: map['ageInYears'],
+      size: map['size'],
+      breed: map['breed'],
+      features: List<String>.from(map['features']),
+      colors: List<String>.from(map['colors']),
+      imageURLs: List<String>.from(map['imageURLs']),
+      shelterId: map['shelterId'],
+      adoptionStatus: map['adoptionStatus'],
+      story: map['story'],
+      publishedAt: map['publishedAt'],
+    );
+  }
+
+
 }
