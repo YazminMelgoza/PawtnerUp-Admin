@@ -4,8 +4,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../config/theme/color.dart';
 
-class CategoryItem extends StatelessWidget {
-  const CategoryItem({
+class StatusItem extends StatelessWidget {
+  const StatusItem({
     super.key,
     required this.data,
     this.selected = false,
@@ -17,19 +17,20 @@ class CategoryItem extends StatelessWidget {
   final GestureTapCallback? onTap;
 
   @override
+
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 500),
         curve: Curves.fastOutSlowIn,
-        padding: const EdgeInsets.fromLTRB(5, 20, 5, 0),
+        padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
         margin: const EdgeInsets.only(right: 10),
-        width: 90,
-        height: 90,
+        width: MediaQuery.of(context).size.width * .4,
+        height: 40,
         decoration: BoxDecoration(
           color: selected
-              ? const Color(0xFFFFBC00)
+              ? const Color(0xFFFFF5D6)
               : AppColor.cardColor,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
@@ -44,18 +45,20 @@ class CategoryItem extends StatelessWidget {
             ),
           ],
         ),
-        child: Column(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SvgPicture.asset(
-              data["icon"],
-              width: 35,
-              height: 35,
-              // ignore: deprecated_member_use
-              color: selected ? Colors.white : null,
+            SizedBox(width: 20,),
+            (data["name"] == "Adoptados")?SvgPicture.asset(
+              'assets/images/adoptado.svg',
+              width: 30, // Ancho deseado
+              height: 20, // Altura deseada
+            ):SvgPicture.asset(
+              'assets/images/disponible.svg',
+              width: 30, // Ancho deseado
+              height: 20, // Altura deseada
             ),
-            const SizedBox(
-              height: 8,
-            ),
+            SizedBox(width: 10,),
             Expanded(
               child: Text(
                 data["name"],
@@ -64,13 +67,13 @@ class CategoryItem extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
-                  color: selected ? Colors.white : AppColor.textColor,
+                  color: selected ? Color(0xFFFF8D00) : AppColor.textColor,
                 ),
               ),
             ),
           ],
         ),
-      ),
+      )
     );
   }
 }

@@ -64,7 +64,7 @@ class PetItem extends StatelessWidget {
                         data['name'],
                         style: const TextStyle(
                           fontSize: 18,
-                          color: Colors.black,
+                          color: Color(0xFFFF8D00),
                           fontWeight: FontWeight.bold,
                         ),
                       ),

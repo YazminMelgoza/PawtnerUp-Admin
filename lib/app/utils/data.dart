@@ -8,6 +8,12 @@ List categories = [
   //{"name": "Conejo", "icon": "assets/icons/rabbit.svg"},
   //{"name": "Pez", "icon": "assets/icons/fish.svg"},
 ];
+List listStatus = [
+  {"name": "Disponibles", "value": "Disponible"},
+  {"name": "Adoptados", "value": "Adoptado"},
+
+
+];
 
 List shelters = [
   {

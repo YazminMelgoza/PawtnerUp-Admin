@@ -1,27 +1,50 @@
+import 'dart:ui';
+import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:pawtnerup_admin/app/menu/screen/chat/chat_detail.dart';
-import 'package:pawtnerup_admin/models/chat_model.dart';
-import 'package:pawtnerup_admin/models/pet_model.dart';
-import 'package:pawtnerup_admin/models/shelter_model.dart';
-import 'package:pawtnerup_admin/models/user_model.dart';
-import 'package:pawtnerup_admin/provider/auth_provider.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
-import '../../../../config/theme/color.dart';
+
+import '../../../../models/chat_model.dart';
+import '../../../../models/pet_model.dart';
+import '../../../../models/shelter_model.dart';
+import '../../../../provider/location_provider.dart';
+import '../../../../services/chat_service.dart';
 import '../../../../services/shelter_service.dart';
-import 'package:pawtnerup_admin/services/chat_service.dart';
+import '../../../../shared/widgets/custom_image.dart';
+import '../../../../utils/location_utils.dart';
+import '../chat/chat.dart';
+import '../chat/chat_detail.dart';
 
-class PetProfilePage extends StatelessWidget {
+class PetProfilePage extends StatefulWidget {
   final PetModel pet;
-  final ChatService _chatService = ChatService();
+  const PetProfilePage({super.key, required this.pet});
 
-  PetProfilePage({required Key key, required this.pet}) : super(key: key);
+  @override
+  State<PetProfilePage> createState() => _PetProfilePageState();
+}
+
+class _PetProfilePageState extends State<PetProfilePage> {
+  final ChatService _chatService = ChatService();
 
   @override
   Widget build(BuildContext context) {
+    String imgFondo = widget.pet.imageURLs[0];
+    int providerBool = 0;
+    double prueba = 0;
+    //Comprueba si se puede acceder el provider, es decir, si sí se puede usar el gps.
+    LocationProvider lp = Provider.of<LocationProvider>(context, listen: false);
+    try {
+      prueba = lp.location!.ubicacion!.latitude;
+      providerBool = 3;
+    } catch (e) {
+      providerBool = 2;
+    }
     return FutureBuilder<ShelterModel?>(
-      future: ShelterService().getShelterById(pet.shelterId),
+      future: ShelterService().getShelterById(widget.pet.shelterId),
       builder: (context, AsyncSnapshot<ShelterModel?> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
@@ -37,188 +60,308 @@ class PetProfilePage extends StatelessWidget {
           );
         } else {
           var shelter = snapshot.data!;
-          var shelterName = shelter.name;
-          String colorsString = pet.colors.join(',');
+          String colorsString = widget.pet.colors.join(',');
           return Scaffold(
-            body: Stack(
-              children: [
-                // Imagen de fondo
-                Positioned.fill(
-                  child: PageView.builder(
-                    itemCount: pet.imageURLs.length,
-                    itemBuilder: (context, index) {
-                      return Image.network(
-                        pet.imageURLs[index],
-                        fit: BoxFit.cover,
-                      );
-                    },
-                  ),
-                ),
-                // AppBar transparente
-                /*Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  child: AppBar(
-                    backgroundColor: Colors.transparent,
-                    elevation: 0,
-                    leading: IconButton(
-                      icon: const Icon(Icons.arrow_back),
-                      onPressed: () => Navigator.pop(context),
-                      color: Colors.white,
-                    ),
-                  ),
-                ),*/
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  child: Container(
-                    padding: const EdgeInsets.all(20),
+            backgroundColor: Colors.white,
+            body: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: Column(
+                children: [
+                  Container(
+                    constraints: const BoxConstraints(maxHeight: 300),
                     decoration: const BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20.0),
-                        topRight: Radius.circular(20.0),
+                      image: DecorationImage(
+                        image: AssetImage("assets/images/fondoblue.png"),
+                        fit: BoxFit.cover,
                       ),
                     ),
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            pet.name,
-                            style: const TextStyle(
-                              fontSize: 32,
-                              fontWeight: FontWeight.bold,
+                    child: Stack(children: [
+                      PageView.builder(
+                        itemCount: widget.pet.imageURLs.length,
+                        itemBuilder: (context, index) {
+                          return GestureDetector(
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return Dialog(
+                                    child: Image.network(
+                                      widget.pet.imageURLs[index],
+                                      fit: BoxFit.cover,
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                            child: Image.network(
+                              widget.pet.imageURLs[index],
+                              fit: BoxFit.cover,
                             ),
-                          ),
-                          const SizedBox(height: 20.0),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          );
+                        },
+                      ),
+                      Positioned(
+                        top: 40,
+                        left: 15,
+                        child: IconButton(
+                          icon: const Icon(Icons.arrow_back),
+                          onPressed: () => Navigator.pop(context),
+                          color: Colors.white,
+                        ),
+                      ),
+                    ]),
+                  ),
+                  //Info de la mascota
+                  Padding(
+                    padding: const EdgeInsets.all(25),
+                    child: Column(
+                      children: [
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    widget.pet.name ,
+                                    style: const TextStyle(
+                                      fontSize: 30,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color.fromRGBO(11, 96, 151, 1),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.location_on, // Icono de ubicación
+                                    color: Color.fromRGBO(11, 96, 151, 1), // Color azul personalizado
+                                  ),
+                                  Text(
+                                    (providerBool == 3)?LocationUtils().calcularKilometros(shelter.latitude!, shelter.longitude!, lp.location!.ubicacion!.latitude,lp.location!.ubicacion!.longitude):"NA",
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color.fromRGBO(11, 96, 151, 1), // Color azul personalizado
+                                    ),
+                                  ),
+
+                                ],
+                              ),
+                            ]
+                        ),
+                        const SizedBox(height: 20),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
                             children: [
                               _buildInfoContainer(
                                 label: 'Edad',
-                                value: '${pet.ageInYears ?? 'Desconocida'}',
+                                value:
+                                '${widget.pet.ageInYears ?? 'Unknown Age'} años',
                               ),
+
+                              const SizedBox(width: 20),
                               _buildInfoContainer(
                                 label: 'Sexo',
-                                value: pet.sex,
+                                value: widget.pet.sex,
                               ),
+                              const SizedBox(width: 20),
+                              _buildInfoContainer(
+                                label: 'Tamaño',
+                                value: widget.pet.size,
+                              ),
+                              const SizedBox(width: 20),
+                              _buildInfoContainer(
+                                label: 'Raza',
+                                value: widget.pet.breed,
+                              ),
+                              const SizedBox(width: 20),
                               _buildInfoContainerColor(
                                 label: 'Color',
                                 value: colorsString,
                               ),
                             ],
                           ),
-                          const SizedBox(height: 20.0),
-                          Row(
-                            children: [
-                              ClipOval(
-                                child: SizedBox(
-                                  height: 50.0,
-                                  width: 50.0,
-                                  child: Image.network(
-                                    shelter.imageURL,
-                                    fit: BoxFit.cover,
-                                  ),
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Descripción",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                widget.pet.story!,
+                                textAlign: TextAlign.justify,
+                                style: const TextStyle(
+                                  fontSize: 16,
                                 ),
                               ),
-                              const SizedBox(width: 20.0),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    shelterName,
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.normal,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 5.0),
-                                  const Text(
-                                    'Propietario',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.normal,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                ],
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            const Text(
+                              "Ubicación",
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 16,
                               ),
-                            ],
-                          ),
-                          const SizedBox(height: 20.0),
-                          // Action buttons
-                          /*Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-
-                              ElevatedButton(
-                                onPressed: () async {
-                                  goToChat(
-                                      context: context,
-                                      chatService: _chatService,
-                                      shelter: shelter,
-                                      pet: pet,
-                                      user: FirebaseAuth.instance.currentUser!
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color.fromRGBO(11, 96, 151, 0.7),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(50.0),
-                                  ),
-                                  minimumSize: Size(MediaQuery.of(context).size.width - 45, 50.0), // Set minimum width
-                                ),
-                                child: Row( // Use Row to arrange elements horizontally
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween, // Space them evenly
-                                  children: [
-                                    IconButton(
-                                      icon: const Icon(Icons.chat),
-                                      color: Colors.white,  onPressed: () async {
-                                      goToChat(
-                                          context: context,
-                                          chatService: _chatService,
-                                          shelter: shelter,
-                                          pet: pet,
-                                          user: FirebaseAuth.instance.currentUser!
-                                      );
-                                    }, // This button won't have a separate action (optional)
-                                    )
-                                    ,
-                                    const Text(
-                                      'Adoptame',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16.0,
+                            ),
+                            Text(
+                              shelter.address,
+                              style: const TextStyle(
+                                fontSize: 16,
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            const Text(
+                              "Características",
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 16,
+                              ),
+                            ),
+                            Wrap(
+                              children: widget.pet.features.map((feature) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(
+                                      right: 10, bottom: 0),
+                                  child: ChoiceChip(
+                                    label: Text(
+                                      feature,
+                                      style: const TextStyle(
+                                        color: Color(0xFF084065),
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-
+                                    selected: false,
+                                    onSelected: null,
+                                    side: const BorderSide(
+                                      color: Color(0xFF084065),
+                                      width: 1,
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  //Info del refugio
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          ShelterDetailPage(shelter: shelter),
+                                    ),
+                                  );
+                                },
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    CustomImage(
+                                      shelter.imageURL,
+                                      borderRadius: BorderRadius.circular(50),
+                                      isShadow: true,
+                                      width: 60,
+                                      height: 60,
+                                    ),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            shelter.name,
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 2,
+                                            style: const TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                              color: Color(0xFF084065),
+                                            ),
+                                          ),
+                                          const Text(
+                                            "Ver Perfil",
+                                            style: TextStyle(
+                                              fontSize: 16, // Tamaño de letra 16
+                                              color: Colors.blue, // Color azul
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
-                            ],
-                          ),*/
-                        ],
-                      ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 10,),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            onPressed: () async {
+                              goToChat(
+                                context: context,
+                                chatService: _chatService,
+                                shelter: shelter,
+                                pet: widget.pet,
+                                user: FirebaseAuth.instance.currentUser!,
+                              );
+                            },
+                            icon: const Icon(
+                              Icons.chat,
+                              color: Colors.white,
+                            ),
+                            label: const Text(
+                              'Adoptame',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color.fromRGBO(11, 96, 151, .7),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(50.0),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ),
-                // Back button positioned on top left
-                Positioned(
-                  top: 20.0,
-                  left: 20.0,
-                  child: IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () => Navigator.pop(context),
-                    color: Colors.white
-                    ,
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         }
@@ -226,7 +369,7 @@ class PetProfilePage extends StatelessWidget {
     );
   }
 
- /* void goToChat(
+  void goToChat(
       {required BuildContext context,
         required ChatService chatService,
         required ShelterModel shelter,
@@ -241,14 +384,12 @@ class PetProfilePage extends StatelessWidget {
           MaterialPageRoute(
               builder: (context) => ChatDetailPage(chatData: chatRoom!)));
     } else {
-      final AuthenticationProvider _authProvider =
-      Provider.of<AuthenticationProvider>(context, listen: false);
-      UserModel user = _authProvider.user!;
+      User user = FirebaseAuth.instance.currentUser!;
       chatRoom = ChatModel(
         id: '',
         userId: user.uid,
-        userImageURL: user.profilePicURL ?? '',
-        userName: user.name,
+        userImageURL: user.photoURL ?? '',
+        userName: user.displayName ?? '',
         shelterImageURL: shelter.imageURL,
         shelterName: shelter.name,
         shelterId: pet.shelterId,
@@ -258,7 +399,7 @@ class PetProfilePage extends StatelessWidget {
         recentMessageContent: null,
         recentMessageTime: null,
         recentMessageSenderId: null,
-        conversationStatus: 'intento de adopción',
+        conversationStatus: 'En Proceso',
       );
 
       DocumentReference newChatDoc = await _chatService.createChat(chatRoom);
@@ -271,10 +412,11 @@ class PetProfilePage extends StatelessWidget {
       }
     }
   }
-*/
-  Widget _buildInfoContainer({required String label, required String value}) {
+
+  Widget _buildInfoContainerColor(
+      {required String label, required String value}) {
     return Container(
-      width: 110,
+      width: 170,
       margin: const EdgeInsets.symmetric(
         vertical: 5.0,
       ),
@@ -295,31 +437,31 @@ class PetProfilePage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            value,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: AppColor.yellowCustom,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 5.0),
-          Text(
             label,
             style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.normal,
               color: Colors.grey,
             ),
+          ),
+          const SizedBox(height: 10.0), // Espacio más grande entre los textos
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Color.fromRGBO(11, 96, 151, .99),
+            ),
+            textAlign: TextAlign.center,
           ),
         ],
       ),
     );
   }
-  Widget _buildInfoContainerColor(
-      {required String label, required String value}) {
+
+  Widget _buildInfoContainer({required String label, required String value}) {
     return Container(
-      width: 100, // Ajustar el ancho del contenedor
+      width: 170,
       margin: const EdgeInsets.symmetric(
         vertical: 5.0,
       ),
@@ -340,22 +482,22 @@ class PetProfilePage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            value,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: AppColor.yellowCustom,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 5.0),
-          Text(
             label,
             style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.normal,
               color: Colors.grey,
             ),
+          ),
+          const SizedBox(height: 10.0), // Espacio más grande entre los textos
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Color.fromRGBO(11, 96, 151, .99),
+            ),
+            textAlign: TextAlign.center,
           ),
         ],
       ),
