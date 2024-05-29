@@ -3,13 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:pawtnerup_admin/models/shelter_model.dart';
 import 'package:pawtnerup_admin/services/shelter_service.dart';
 import 'package:pawtnerup_admin/shared/shared.dart';
+import 'package:pawtnerup_admin/config/config.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-// Utils for Google Login
+//Utils for Google Login
 import 'package:pawtnerup_admin/utils/login_google_utils.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 
-import '../../../../config/theme/color.dart';
+import '../../../../provider/auth_provider.dart';
 import 'edit_screen.dart';
 
 class UserSettingsScreen extends StatelessWidget {
@@ -19,7 +20,7 @@ class UserSettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Perfil', style: TextStyle(color: Colors.white, fontFamily: 'outfit')),
+        title: const Text('Perfil', style: TextStyle( color: Colors.white, fontFamily: 'outfit')),
         backgroundColor: Color.fromRGBO(255, 141, 0, 100),
         actions: [
           IconButton(
@@ -37,10 +38,12 @@ class UserSettingsScreen extends StatelessWidget {
                   );
                 }
               }
+
             },
-            icon: const Icon(Icons.edit, color: Colors.white),
-          ),
-        ],
+            icon: const Icon(Icons.edit, color: Colors.white,),
+
+
+          )],
         toolbarHeight: 35.0, // Adjust toolbar height if necessary
       ),
       body: const _UserSettingsView(),
@@ -58,191 +61,188 @@ class _UserSettingsView extends StatefulWidget {
 class __UserSettingsState extends State<_UserSettingsView> {
   String getuid() {
     User? user = FirebaseAuth.instance.currentUser;
-    return user?.uid ?? '';
+    if (user != null) {
+      String userId = user.uid;
+      return userId;
+    } else {
+      return '';
+    }
   }
 
-  Stream<ShelterModel?> getShelterStream() {
-    String userId = getuid();
-    return FirebaseFirestore.instance
-        .collection('shelters')
-        .doc(userId)
-        .snapshots()
-        .map((snapshot) => snapshot.exists ? ShelterModel.fromFirebase(snapshot) : null);
+  Future<ShelterModel?> getShelter() {
+    return ShelterService().getShelterById(getuid());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColor.appBgColor,
-      body: StreamBuilder<ShelterModel?>(
-        stream: getShelterStream(),
-        builder: (context, snapshot) {
+      body: FutureBuilder(
+        future: Future.wait(
+            [LoginGoogleUtils().isUserLoggedIn(), getShelter()]),
+        builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
-          }
+          } else {
+            User? user = FirebaseAuth.instance.currentUser;
+            if (user != null) {
+              String userId = user.uid;
+              print('User ID: $userId');
+            } else {
+              print('User ID: ');
+            }
+            const radius = Radius.circular(10);
+            String? email = FirebaseAuth.instance.currentUser?.email;
+            String? name = FirebaseAuth.instance.currentUser?.displayName;
+            ShelterModel? shelter = snapshot.data?[1] as ShelterModel?;
+            String? profilePhoto = shelter?.imageURL;
 
-          ShelterModel? shelter = snapshot.data;
-          const radius = Radius.circular(10);
-          String? profilePhoto = shelter?.imageURL;
+            return SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
 
-          return SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 15, bottom: 0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      _buildProfileImage(profilePhoto.toString()),
-                      if (shelter != null) ...[
-                        const SizedBox(height:8),
-                        Text(
-                          shelter.name,
-                          style: const TextStyle(
-                              color: Color.fromRGBO(255, 141, 0, 100),
-                              fontFamily: 'outfit',
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 5),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.location_pin,
-                              color: AppColor.yellow,
-                            ),
-                            const SizedBox(width: 5),
-                            Expanded(
-                              child: Text(
-                                shelter.address,
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 16,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 5),
-                        _buildDescriptionCard(shelter.description),
-                      ],
-                      const SizedBox(height: 5),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "Correo Electronico",
-                        style: TextStyle(
-                            fontFamily: 'outfit',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600),
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        shelter?.email ?? 'No email available',
-                        style: const TextStyle(
-                            fontFamily: 'outfit',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w300),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "Sitio Web",
-                        style: TextStyle(
-                            fontFamily: 'outfit',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600),
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        shelter?.website ?? 'No website available',
-                        style: const TextStyle(
-                            fontFamily: 'outfit',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w300),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "Link de Adopcion",
-                        style: TextStyle(
-                            fontFamily: 'outfit',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600),
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        shelter?.adoptionFormURL ?? 'Actualmente no hay link de adopcion',
-                        style: const TextStyle(
-                            fontFamily: 'outfit',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w300),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 7),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(70, 0, 15, 25),
-                  child: Container(
-                    width: 253, // Set the desired width here
-                    child: FilledButton(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: Color.fromRGBO(255, 141, 0, 100),
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(8.0), // Define your radius value
-                            bottomRight: Radius.circular(8.0),
-                            topLeft: Radius.circular(8.0),
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 20, bottom: 0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        _buildProfileImage(profilePhoto.toString()),
+                        if (shelter != null) ...[
+                          const SizedBox(height: 10),
+                          Text(
+                            shelter.name,
+                            style: const TextStyle(
+                                color: Color.fromRGBO(255, 141, 0, 100),
+                                fontFamily: 'outfit',
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold),
                           ),
-                        ),
-                      ),
-                      onPressed: () async {
-                        await LoginGoogleUtils().signOutGoogle();
-                        await LoginGoogleUtils().singOutWithEmail();
-                        if (FirebaseAuth.instance.currentUser == null) {
-                          if (context.mounted) {
-                            context.go("/login");
-                          }
-                        }
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const SizedBox(width: 6), // Espacio entre el icono y el texto
-                          Text("Cerrar Sesion"),
+                          const SizedBox(height: 5),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.location_pin,
+                                color: AppColor.yellow,
+                              ),
+                              const SizedBox(width: 5),
+                              Expanded(
+                                child: Text(
+                                  shelter.address,
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 16,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 5),
+                          _buildDescriptionCard(shelter.description),
                         ],
-                      ),
+                        const SizedBox(height: 5),
+
+                      ],
                     ),
                   ),
-                ),
-              ],
-            ),
-          );
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Correo Electronico",
+                          style: TextStyle(
+                              fontFamily: 'outfit',
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600),
+                        ),
+                        const SizedBox(height: 5),
+          const Text(
+          "Link de Adopcion",
+          style: TextStyle(
+          fontFamily: 'outfit',
+          fontSize: 16,
+          fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 3),
+          Text(
+          shelter?.adoptionFormURL ?? 'Actualmente no hay link de adopcion',
+          style: const TextStyle(
+          fontFamily: 'outfit',
+          fontSize: 16,
+          fontWeight: FontWeight.w300),
+          ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Sitio Web/Link de Adopcion",
+                          style: TextStyle(
+                              fontFamily: 'outfit',
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600),
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          shelter?.adoptionFormURL ?? 'No website available',
+                          style: const TextStyle(
+                              fontFamily: 'outfit',
+                              fontSize: 16,
+                              fontWeight: FontWeight.w300),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(70, 0, 15, 25),
+                    child: Container(
+
+                      width: 253, // Set the desired width here
+                      child: FilledButton(
+                        style: FilledButton.styleFrom(
+                          backgroundColor: Color.fromRGBO(255, 141, 0, 100),
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(8.0),
+                              // Define your radius value
+                              bottomRight: Radius.circular(8.0),
+                              topLeft: Radius.circular(8.0),
+                            ),
+                          ),
+                        ),
+                        onPressed: () async {
+                          await LoginGoogleUtils().signOutGoogle();
+                          await LoginGoogleUtils().singOutWithEmail();
+                          if (FirebaseAuth.instance.currentUser == null) {
+                            if (context.mounted) {
+                              context.go("/login");
+                            }
+                          }
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const SizedBox(width: 6),
+                            // Espacio entre el icono y el texto
+                            Text("Cerrar Sesion"),
+                          ],
+                        ),
+                      ),
+                    ),),
+                ],),);
+          }
         },
       ),
     );
@@ -250,8 +250,8 @@ class __UserSettingsState extends State<_UserSettingsView> {
 
   Widget _buildProfileImage(String url) {
     return Container(
-      width: 170,
-      height: 170,
+      width: 180,
+      height: 180,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
@@ -261,7 +261,7 @@ class __UserSettingsState extends State<_UserSettingsView> {
         image: DecorationImage(
           fit: BoxFit.cover,
           image: NetworkImage(
-            url.isEmpty
+            url == 'null'
                 ? 'https://cdn-icons-png.flaticon.com/512/3541/3541871.png'
                 : url,
           ),
@@ -273,7 +273,7 @@ class __UserSettingsState extends State<_UserSettingsView> {
   Widget _buildDescriptionCard(String? description) {
     return Container(
       margin: const EdgeInsets.all(15.0),
-      padding: const EdgeInsets.all(15.0),
+      padding: const EdgeInsets.all(4.0),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10.0),
@@ -289,7 +289,7 @@ class __UserSettingsState extends State<_UserSettingsView> {
       child: Text(
         description ?? 'No description available',
         style: const TextStyle(
-          fontSize: 16.0,
+          fontSize: 15.0,
         ),
       ),
     );
