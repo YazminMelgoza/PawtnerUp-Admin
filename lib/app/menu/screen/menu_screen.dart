@@ -93,6 +93,7 @@ class __MenuViewState extends State<_MenuView> {
     super.initState();
     obtenerYActualizarUbicacion();
   }
+  List<String> sizes = ['Chiquito', 'Mediano','Grandote'];
 
   @override
   Widget build(BuildContext context) {
@@ -123,7 +124,6 @@ class __MenuViewState extends State<_MenuView> {
             children:
             [
               _statusWidget(),
-
             ],
           ),
           FutureBuilder<List<PetModel>>(
@@ -162,7 +162,7 @@ class __MenuViewState extends State<_MenuView> {
                   }
                   return Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
                       child: GridView.builder(
                         gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
@@ -171,8 +171,7 @@ class __MenuViewState extends State<_MenuView> {
                           mainAxisSpacing: 10.0,
                           childAspectRatio: 0.7,
                         ),
-                        itemCount: filteredPets
-                            .length, // Número de elementos en el grid
+                        itemCount: filteredPets.length,
                         itemBuilder: (context, index) {
                           return PetItem(
                             data: filteredPets[index].toMap(),

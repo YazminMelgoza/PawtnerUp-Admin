@@ -79,19 +79,21 @@ class _AddPetState extends State<_AddPet> {
   final descripcion = TextEditingController();
 
   File? image;
-  List<String> animals = ['Dog', 'Cat'];
+  List<String> animals = ['dog', 'cat'];
+  List<String> sizes = ['Chiquito', 'Mediano','Grandote'];
+  String selectedSize = 'Chiquito';
   List<String> BreedDogs = ['Labrador', 'Pastor Aleman', 'Chihuahua', 'Bulldog', 'Beagle'];
-  List<String> SexAnimal = ['Female', 'Male'];
+  List<String> SexAnimal = ['female', 'male'];
   List<String> BreedCats = ['Persa', 'Siames', 'Coon', 'Bengali', 'Britanico'];
   List<double> Edades = [0.5, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0];
   List<String> Personalidad = [];
   List<String> Colores = [];
   List<String> PhotosURLs = [];
-  String selectedAnimal = 'Dog';
+  String selectedAnimal = 'dog';
   String selectedDog = 'Labrador';
   String selectedCats = 'Persa';
   double selectedEdades = 1.0;
-  String selectedSex = 'Male';
+  String selectedSex = 'male';
   User? user = FirebaseAuth.instance.currentUser;
 
 
@@ -482,6 +484,49 @@ class _AddPetState extends State<_AddPet> {
                     Align(
                       alignment: Alignment.topLeft,
                       child: Text(
+                        "Tamaño",
+                        textAlign: TextAlign.left,
+                        style: const TextStyle(fontSize: 20.0),
+                      ),
+
+                    ),
+                    Row(
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.5,
+
+                          child: DropdownButton<String>(
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.black54,
+                              fontFamily: 'outfit',
+                              fontWeight: FontWeight.w500,
+                            ),
+                            value: selectedSize,
+                            items: sizes
+                                .map((item) => DropdownMenuItem<String>(
+                              value: item,
+                              child: Text(item),
+                            ))
+                                .toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                selectedSize = value!;
+                              });
+                            },
+                            iconEnabledColor: Colors.yellow,
+                            iconDisabledColor: Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                Column(
+                  children: [
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: Text(
                         "Raza",
                         textAlign: TextAlign.left,
                         style: const TextStyle(fontSize: 20.0),
@@ -780,22 +825,89 @@ class _AddPetState extends State<_AddPet> {
                     icon: MdiIcons.fromString("paw"),
 
                     onPressed: () async {
-                      String urlFile = await PetService().uploadProfilePic(image!, getuid());
-                      PhotosURLs.add(urlFile);
+
+                      if(_uploadedPhotos.isEmpty)
+                      {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Debes ingresar al menos una fotografía'),
+                            duration: Duration(seconds: 3),
+
+                          ),
+                        );
+                        return;
+                      }
+                      if(name.text.trim() == "")
+                      {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Ingresa el nombre de la mascota'),
+                            duration: Duration(seconds: 3),
+
+                          ),
+                        );
+                        return;
+                      }
+                      if(raza.text.trim() == "")
+                      {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Ingresa la raza'),
+                            duration: Duration(seconds: 3),
+
+                          ),
+                        );
+                        return;
+                      }
+                      if(descripcion.text.trim() == "")
+                      {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Ingresa una descripcion'),
+                            duration: Duration(seconds: 3),
+
+                          ),
+                        );
+                        return;
+                      }
+                      if(Personalidad.isEmpty)
+                      {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Debes ingresar al menos una característica de personalidad'),
+                            duration: Duration(seconds: 3),
+
+                          ),
+                        );
+                        return;
+                      }
+                      if(Colores.isEmpty)
+                      {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Debes ingresar al menos un color de la mascota'),
+                            duration: Duration(seconds: 3),
+
+                          ),
+                        );
+                        return;
+                      }
+
+
                       PetModel newPet = PetModel(
-                        id: '', // Generate a unique ID or leave it empty to let Firestore generate one
+                        id: '',
                         name: name.text,
                         type: selectedAnimal,
                         sex: selectedSex,
                         ageInYears: selectedEdades.toInt(),
-                        size: '', // Add size if applicable
-                        breed: selectedAnimal == 'Dog' ? selectedDog : selectedCats,
+                        size: selectedSize, // Add size if applicable
+                        breed: raza.text,
                         features: Personalidad,
-                        colors: [], // Add colors if applicable
-                        imageURLs: PhotosURLs, // Add image URLs if applicable
+                        colors: Colores, // Add colors if applicable
+                        imageURLs: _uploadedPhotos, // Add image URLs if applicable
                         shelterId: getuid(), // Add shelter ID if applicable
-                        adoptionStatus: 'published', // Add adoption status if applicable
-                        story: descripcion.text.isNotEmpty ? descripcion.text : null,
+                        adoptionStatus: 'available', // Add adoption status if applicable
+                        story: descripcion.text.isNotEmpty ? descripcion.text : "No hay descripción",
                         publishedAt: Timestamp.now().millisecondsSinceEpoch, // Add publishedAt timestamp
                       );
                       try {

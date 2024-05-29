@@ -47,7 +47,7 @@ class PetItem extends StatelessWidget {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
                   child: Image.network(
-                    data["imageURLs"]![0],
+                    data["imageURLs"].first,
                     fit: BoxFit.cover,
                     width: double.infinity,
                     height: double.infinity,
