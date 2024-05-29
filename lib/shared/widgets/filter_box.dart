@@ -43,10 +43,13 @@ class FilterItem extends StatelessWidget {
         child: Column(
           children: [
             (data["value"] == "EN CURSO")?
-            Icon(Icons.access_time):
+            Icon(Icons.access_time,
+              color: Colors.blue,):
             (data["value"]== "FINALIZADO")?
-            Icon(Icons.check):
-            Icon(Icons.cancel),
+            Icon(Icons.check,
+              color: Colors.green,):
+            Icon(Icons.cancel,
+              color: Colors.red,),
             const SizedBox(
               height: 8,
             ),

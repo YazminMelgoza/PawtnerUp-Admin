@@ -1,18 +1,25 @@
+// Debes eliminar esta importación
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:pawtnerup_admin/app/menu/screen/Pet/add_pet.dart';
-import 'package:pawtnerup_admin/shared/shared.dart';
-import 'package:pawtnerup_admin/config/config.dart';
-//Location
-import 'package:pawtnerup_admin/utils/location_utils.dart';
-
 //Data
-import 'package:pawtnerup_admin/app/utils/data.dart';
-import 'package:pawtnerup_admin/provider/auth_provider.dart';
-import 'package:pawtnerup_admin/services/pet_service.dart';
+import 'package:geolocator/geolocator.dart';
+import '../../../config/theme/color.dart';
+import '../../../models/location_model.dart';
 import '../../../models/pet_model.dart';
-import 'package:pawtnerup_admin/app/menu/screen/Pet/petprofile.dart';
+
 import 'package:provider/provider.dart';
+
+import '../../../provider/auth_provider.dart';
+import '../../../provider/location_provider.dart';
+import '../../../services/location_service.dart';
+import '../../../services/pet_service.dart';
+import '../../../shared/widgets/category_box.dart';
+import '../../../shared/widgets/pet_item.dart';
+import '../../../shared/widgets/status_box.dart';
+import '../../../utils/location_utils.dart';
+import '../../utils/data.dart';
+import 'Pet/add_pet.dart';
+import 'Pet/petprofile.dart';
 
 class MenuScreen extends StatelessWidget {
   const MenuScreen({super.key});
@@ -33,17 +40,28 @@ class MenuScreen extends StatelessWidget {
         nameToShow = "$nameToShow $name";
       }
     } catch (e) {
-      nameToShow = "Hola Refugio!";
+      nameToShow = "Ha ocurrido un problema, reinicia la aplicación";
     }
 
     return Scaffold(
-      // drawer: SideMenu(scaffoldKey: scaffoldKey),
+     /*appBar: AppBar(
+        title: Text(
+          nameToShow,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+          ),
+        ),
+        backgroundColor: const Color(0xFFFF8D00),
+
+      ),*/
       body: const _MenuView(),
     );
   }
 }
 
 class _MenuView extends StatefulWidget {
+
   const _MenuView();
   @override
   __MenuViewState createState() => __MenuViewState();
@@ -52,30 +70,43 @@ class _MenuView extends StatefulWidget {
 class __MenuViewState extends State<_MenuView> {
   //Comprueba Ubicacion
   String ubicacion = "Ubicacion Desconocida";
+  Position? location = null;
+  LocationProvider? lp = null;
   void obtenerYActualizarUbicacion() async {
-    String ubi = await LocationUtils().obtenerLocalizacion();
+    await LocationService().defineLocation(context);
+
+    LocationModel loc = Provider.of<LocationProvider>(
+        context,
+        listen: false)
+        .location!;
+    String ubi = await LocationUtils().getAdressFromCoordinates(loc.ubicacion);
     setState(() {
-      ubicacion =
-          ubi; // Actualiza la ubicación una vez que se resuelve el Future
+      location = loc.ubicacion;
+      ubicacion = ubi;
     });
+    //Forma inicial de obtener ubicación
+    //String ubi = await LocationUtils().obtenerLocalizacion();
   }
 
   @override
   void initState() {
     super.initState();
-    // Llama al método para actualizar la ubicación al entrar en el menu screen
     obtenerYActualizarUbicacion();
   }
 
   @override
   Widget build(BuildContext context) {
+
+
+    AuthenticationProvider authProvider =
+    Provider.of<AuthenticationProvider>(context, listen: false);
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Column(
         children: [
+          SizedBox(height: 40,),
           _buildAppBar(ubicacion),
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: SingleChildScrollView(
@@ -86,17 +117,24 @@ class __MenuViewState extends State<_MenuView> {
               ),
             ],
           ),
+          SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children:
+            [
+              _statusWidget(),
+
+            ],
+          ),
           FutureBuilder<List<PetModel>>(
-              future: PetService().getAllPets(),
+              future: PetService().getPetsByShelterId(authProvider.user!.uid),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
                     child: CircularProgressIndicator(),
                   );
                 } else if (snapshot.hasError) {
-                  print(snapshot);
                   return Center(
-
                     child: Text('Error: ${snapshot.error}'),
                   );
                 } else if (!snapshot.hasData) {
@@ -105,18 +143,26 @@ class __MenuViewState extends State<_MenuView> {
                   );
                 } else {
                   final List<PetModel> pets = snapshot.data!;
-                  List<PetModel> filteredPets = [];
+                  List<PetModel> filteredPets     = [];
+                  List<PetModel> typeFilteredPets = [];
 
                   if (_selectedCategory == 0) {
-                    filteredPets.addAll(pets);
+                    typeFilteredPets.addAll(pets);
                   } else if (_selectedCategory == 1) {
-                    filteredPets.addAll(pets.where((pet) => pet.type == 'dog'));
+                    typeFilteredPets.addAll(pets.where((pet) => pet.type == 'dog'));
                   } else if (_selectedCategory == 2) {
-                    filteredPets.addAll(pets.where((pet) => pet.type == 'cat'));
+                    typeFilteredPets.addAll(pets.where((pet) => pet.type == 'cat'));
+                  }
+                  if(_selectedStatus==0)
+                  {
+                    filteredPets.addAll(typeFilteredPets.where((pet) => pet.adoptionStatus == 'available'));
+                  }else if(_selectedStatus==1)
+                  {
+                    filteredPets.addAll(typeFilteredPets.where((pet) => pet.adoptionStatus == 'adopted'));
                   }
                   return Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.all(10.0),
+                      padding: const EdgeInsets.all(10),
                       child: GridView.builder(
                         gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
@@ -155,26 +201,13 @@ class __MenuViewState extends State<_MenuView> {
 
   int _selectedCategory = 0;
   Widget _categoriesWidget() {
-    List<Widget> lists = List.generate(
-      categories.length,
-          (index) => CategoryItem(
-        data: categories[index],
-        selected: index == _selectedCategory,
-        onTap: () {
-          setState(() {
-            _selectedCategory = index;
-          });
-        },
-      ),
-    );
-
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: List.generate(
         categories.length,
             (index) => Padding(
           padding: const EdgeInsets.symmetric(
-              vertical: 8.0), // Espaciado vertical entre elementos
+              vertical: 8.0),
           child: CategoryItem(
             data: categories[index],
             selected: index == _selectedCategory,
@@ -188,23 +221,45 @@ class __MenuViewState extends State<_MenuView> {
       ),
     );
   }
+  int _selectedStatus = 0;
+  Widget _statusWidget() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: List.generate(
+        listStatus.length,
+            (index) => Padding(
+          padding: const EdgeInsets.symmetric(
+              vertical: 8.0), // Espaciado vertical entre elementos
+          child: StatusItem(
+            data: listStatus[index],
+            selected: index == _selectedStatus,
+            onTap: () {
+              setState(() {
+                _selectedStatus = index;
+              });
+            },
+          ),
+        ),
+      ),
+    );
+  }
 
   Widget _buildAppBar(String location) {
-    return Padding(
-        padding: EdgeInsets.symmetric(horizontal: 10.0),
-        child:
-        Column(
-        children:
-        [
-          SizedBox(height: 40),
-          Row(
-              children:
-              [
-                Row(
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: Row(
                   children: [
                     const Icon(
-                      Icons.place_outlined,
-                      color: AppColor.labelColor,
+                      Icons.place,
+                      color: Color(0xFFFF8D00),
                       size: 30,
                     ),
                     const SizedBox(
@@ -221,87 +276,94 @@ class __MenuViewState extends State<_MenuView> {
                     ),
                   ],
                 ),
-              ]
-          ),
-          Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children:
-              [
-              Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                children:
-                  [
-                    Text(
-                      "Tus",
-                      style: TextStyle(
-                        color: AppColor.textColor,
-                        fontWeight: FontWeight.w900,
-                        fontSize: 40,
-                        height: 1.0,
-                      ),
-                    ),
-                    Text(
-                      "mascotas",
-                      style: TextStyle(
-                        color: AppColor.yellowCustom,
-                        fontWeight: FontWeight.w900,
-                        fontSize: 40,
-                        height: 1.0,
-                      ),
-                    ),
-                  ]
               ),
-                ElevatedButton(
-                  onPressed: () {
-                    // Your code here, like navigating to a new screen
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => AddPet(
-                          key: UniqueKey(),
-                        ),
-                      ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black, // Make ElevatedButton background transparent
-                  ),
-                  child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.black, // Set button color here
-                        borderRadius: BorderRadius.circular(10.0), // Set desired corner roundness
-                        border: Border.all(color: Colors.black),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColor.shadowColor.withOpacity(0.1),
-                            spreadRadius: .5,
-                            blurRadius: .5,
-                            offset: const Offset(0, 1), // changes position of shadow
-                          ),
-                        ],
-                      ),
-                      height: 50.0,
-                      alignment: Alignment.center,
-                      child: Row(children: [
-                        Icon(
-                          Icons.pets,
-                          size: 30.0,
-                          color: Colors.white,
-                        ),
-                        Icon(
-                          Icons.add,
-                          size: 25.0,
-                          color: Colors.white,
-                        ),
-                      ],)
+              const SizedBox(
+                height: 3,
+              ),
+               Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 10),
+                  Padding(
+                    padding: EdgeInsets.only(left: 10.0, right: 10.0),
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children:
+                        [
+                          Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children:
+                              [
 
+                                Text(
+                                  "Tus",
+                                  style: TextStyle(
+                                    color: AppColor.textColor,
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 40,
+                                    height: 1.0,
+                                  ),
+                                ),
+                                Text(
+                                  "mascotas",
+                                  style: TextStyle(
+                                    color: Color(0xFFFF8D00),
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 40,
+                                    height: 1.0,
+                                  ),
+                                ),
+                              ]
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              // Your code here, like navigating to a new screen
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => AddPet(
+                                    key: UniqueKey(),
+                                  ),
+                                ),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.black, // Make ElevatedButton background transparent
+                            ),
+                            child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.black, // Set button color here
+                                  borderRadius: BorderRadius.circular(10.0), // Set desired corner roundness
+                                  border: Border.all(color: Colors.black),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppColor.shadowColor.withOpacity(0.1),
+                                      spreadRadius: .5,
+                                      blurRadius: .5,
+                                      offset: const Offset(0, 1), // changes position of shadow
+                                    ),
+                                  ],
+                                ),
+                                height: 50.0,
+                                alignment: Alignment.center,
+                                child: Image.asset(
+                                  'assets/images/addpet.png',
+                                  width: 30, // Establece el ancho de la imagen a 50 píxeles
+                                ),
+
+                            ),
+                          ),
+                        ]
+                    ),
                   ),
-                ),
-              ]
+                  SizedBox(height: 10),
+
+                ],
+              ),
+            ],
           ),
-        ]
-      )
+        ),
+      ],
     );
   }
 }
-
