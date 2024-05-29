@@ -44,12 +44,14 @@ class PetItem extends StatelessWidget {
               child: FractionallySizedBox(
                 widthFactor: 0.9,
                 heightFactor: 0.9,
-                child: CustomImage(
-                  data["imageURLs"]![0],
+                child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
-                  isShadow: false,
-                  width: double.infinity,
-                  height: double.infinity,
+                  child: Image.network(
+                    data["imageURLs"]![0],
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: double.infinity,
+                  ),
                 ),
               ),
             ),

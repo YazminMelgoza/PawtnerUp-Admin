@@ -38,9 +38,21 @@ class CustomImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        if (onPressed != null) {
-          onPressed!();
-        }
+
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return Dialog(
+                child: Image.network(
+                  image,
+                  fit: BoxFit.cover,
+                ),
+              );
+            },
+          );
+          //onPressed!();
+        //onPressed!();
+
       },
       child: Container(
       width: width,
