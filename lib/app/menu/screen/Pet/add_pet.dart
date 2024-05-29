@@ -28,7 +28,13 @@ class AddPet extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // You can customize the app bar further with actions, leading, etc.
+        title: Text(
+          "Agregar Mascota",
+          style: TextStyle(
+            color: Colors.white, // Color del texto con opacidad del 70%
+          ),
+        ),
+        backgroundColor: Color(0xFFFF8D00),
       ),
         body: Stack(
           fit: StackFit.expand,
@@ -188,7 +194,7 @@ class _AddPetState extends State<_AddPet> {
 
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(30),
           child: SingleChildScrollView(
               scrollDirection: Axis.vertical,
               child: Column(
