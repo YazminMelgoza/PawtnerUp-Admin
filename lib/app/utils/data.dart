@@ -11,9 +11,8 @@ List categories = [
 List listStatus = [
   {"name": "Disponibles", "value": "Disponible"},
   {"name": "Adoptados", "value": "Adoptado"},
-
-
 ];
+
 
 List shelters = [
   {

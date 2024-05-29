@@ -8,17 +8,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../config/theme/color.dart';
 import '../../../../models/chat_model.dart';
 import '../../../../models/pet_model.dart';
 import '../../../../models/shelter_model.dart';
 import '../../../../provider/location_provider.dart';
 import '../../../../services/chat_service.dart';
+import '../../../../services/pet_service.dart';
 import '../../../../services/shelter_service.dart';
 import '../../../../shared/widgets/custom_image.dart';
 import '../../../../utils/location_utils.dart';
 import '../chat/chat.dart';
 import '../chat/chat_detail.dart';
 import 'edit_pet.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class PetProfilePage extends StatefulWidget {
   final PetModel pet;
@@ -333,10 +336,187 @@ class _PetProfilePageState extends State<PetProfilePage> {
                             ),
                           ],
                         ),
-                        SizedBox(height: 10,),
+                        SizedBox(height: 20,),
                         SizedBox(
                           width: double.infinity,
-                          child: ElevatedButton.icon(
+                          child:
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              GestureDetector(
+                              onTap: (){},
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 500),
+                                curve: Curves.fastOutSlowIn,
+                                padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
+                                margin: const EdgeInsets.only(right: 10),
+                                width: MediaQuery.of(context).size.width * .4,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: (widget.pet.adoptionStatus=="available")? Color(0xFFFFF5D6):AppColor.cardColor,
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: Color(0xFFFFBC00),
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppColor.shadowColor.withOpacity(0.1),
+                                      spreadRadius: .5,
+                                      blurRadius: .5,
+                                      offset: const Offset(0, 1), // changes position of shadow
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    SizedBox(width: 20,),
+                                    SvgPicture.asset(
+                                      'assets/images/disponible.svg',
+                                      width: 30, // Ancho deseado
+                                      height: 20, // Altura deseada
+                                    ),
+                                    SizedBox(width: 10,),
+                                    Expanded(
+                                      child: Text(
+                                        "Disponible",
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w500,
+                                          color:  Color(0xFFFF8D00) ,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ),
+                              GestureDetector(
+                                  onTap: () async
+                                  {
+                                    if(widget.pet.adoptionStatus!="available"){return;}
+                                    // Mostrar el diálogo de confirmación
+                                    bool confirmado = await showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Text("Confirmar Adopción"),
+                                          content: Text("¿Estás seguro de que deseas marcar como adoptado a esta mascota y cancelar todos los chats en proceso?, esta acción es irreversible"),
+                                          actions: <Widget>[
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop(false); // Indica que la acción no fue confirmada
+                                              },
+                                              child: Text("Cancelar"),
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop(true); // Indica que la acción fue confirmada
+                                              },
+                                              child: Text("Aceptar"),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                    if(confirmado==false){return;}
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          content: Row(
+                                            children: [
+                                              CircularProgressIndicator(),
+                                              SizedBox(width: 20),
+                                              Text("Procesando Adopción..."),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                      barrierDismissible: false,
+                                    );
+                                    try {
+                                      await PetService().adoptPet(widget.pet.id);
+                                      await ChatService().cancelAllChatsById(widget.pet.id);
+                                      Navigator.pop(context);
+                                      Navigator.pop(context);
+                                    }catch (error) {
+                                      Navigator.pop(context);
+                                      print(error);
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            "Ha ocurrido un error inesperado. Inténtalo de nuevo más tarde.",
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.red,
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    }
+
+
+                                  },
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 500),
+                                    curve: Curves.fastOutSlowIn,
+                                    padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
+                                    margin: const EdgeInsets.only(right: 10),
+                                    width: MediaQuery.of(context).size.width * .4,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      color: (widget.pet.adoptionStatus=="adopted")? Color(0xFFFFF5D6):AppColor.cardColor,
+                                      borderRadius: BorderRadius.circular(10),
+                                      border: Border.all(
+                                        color: Color(0xFFFFBC00),
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: AppColor.shadowColor.withOpacity(0.1),
+                                          spreadRadius: .5,
+                                          blurRadius: .5,
+                                          offset: const Offset(0, 1), // changes position of shadow
+                                        ),
+                                      ],
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        SizedBox(width: 20,),
+                                        SvgPicture.asset(
+                                          'assets/images/adoptado.svg',
+                                          width: 30, // Ancho deseado
+                                          height: 20, // Altura deseada
+                                        ),
+                                        SizedBox(width: 10,),
+                                        Expanded(
+                                          child: Text(
+                                            "Adoptado",
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w500,
+                                              color:  Color(0xFFFF8D00) ,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                              ),
+
+                          ],
+                          ),
+                        ),
+                        SizedBox(height: 20,),
+                        SizedBox(
+                          width: double.infinity,
+                          child:(widget.pet.adoptionStatus=="available")? ElevatedButton.icon(
                             onPressed: () async {
                               Navigator.push(
                                   context,
@@ -365,7 +545,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
                                 borderRadius: BorderRadius.circular(50.0),
                               ),
                             ),
-                          ),
+                          ):Container(),
                         ),
                       ],
                     ),

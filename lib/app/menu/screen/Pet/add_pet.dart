@@ -815,7 +815,7 @@ class _AddPetState extends State<_AddPet> {
                     ],
                   ),
                 ),
-                SizedBox(height: 10,),
+                SizedBox(height: 20,),
                 SizedBox(
                   width: double.infinity,
                   height: 60,
