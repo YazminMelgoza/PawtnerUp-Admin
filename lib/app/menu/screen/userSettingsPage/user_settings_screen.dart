@@ -41,7 +41,7 @@ class UserSettingsScreen extends StatelessWidget {
             icon: const Icon(Icons.edit, color: Colors.white),
           ),
         ],
-        toolbarHeight: 65.0, // Adjust toolbar height if necessary
+        toolbarHeight: 35.0, // Adjust toolbar height if necessary
       ),
       body: const _UserSettingsView(),
     );
@@ -90,13 +90,13 @@ class __UserSettingsState extends State<_UserSettingsView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(top: 50, bottom: 0),
+                  padding: const EdgeInsets.only(top: 15, bottom: 0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       _buildProfileImage(profilePhoto.toString()),
                       if (shelter != null) ...[
-                        const SizedBox(height:15),
+                        const SizedBox(height:8),
                         Text(
                           shelter.name,
                           style: const TextStyle(
@@ -105,7 +105,7 @@ class __UserSettingsState extends State<_UserSettingsView> {
                               fontSize: 24,
                               fontWeight: FontWeight.bold),
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 5),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -127,10 +127,10 @@ class __UserSettingsState extends State<_UserSettingsView> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 5),
                         _buildDescriptionCard(shelter.description),
                       ],
-                      const SizedBox(height: 7),
+                      const SizedBox(height: 5),
                     ],
                   ),
                 ),
@@ -146,7 +146,7 @@ class __UserSettingsState extends State<_UserSettingsView> {
                             fontSize: 16,
                             fontWeight: FontWeight.w600),
                       ),
-                      const SizedBox(height: 7),
+                      const SizedBox(height: 3),
                       Text(
                         shelter?.email ?? 'No email available',
                         style: const TextStyle(
@@ -157,7 +157,7 @@ class __UserSettingsState extends State<_UserSettingsView> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 15),
                   child: Column(
@@ -170,9 +170,9 @@ class __UserSettingsState extends State<_UserSettingsView> {
                             fontSize: 16,
                             fontWeight: FontWeight.w600),
                       ),
-                      const SizedBox(height: 7),
+                      const SizedBox(height: 3),
                       Text(
-                        shelter?.adoptionFormURL ?? 'No website available',
+                        shelter?.website ?? 'No website available',
                         style: const TextStyle(
                             fontFamily: 'outfit',
                             fontSize: 16,
@@ -181,7 +181,31 @@ class __UserSettingsState extends State<_UserSettingsView> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 3),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Link de Adopcion",
+                        style: TextStyle(
+                            fontFamily: 'outfit',
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600),
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        shelter?.adoptionFormURL ?? 'Actualmente no hay link de adopcion',
+                        style: const TextStyle(
+                            fontFamily: 'outfit',
+                            fontSize: 16,
+                            fontWeight: FontWeight.w300),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 7),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(70, 0, 15, 25),
                   child: Container(
@@ -226,8 +250,8 @@ class __UserSettingsState extends State<_UserSettingsView> {
 
   Widget _buildProfileImage(String url) {
     return Container(
-      width: 180,
-      height: 180,
+      width: 170,
+      height: 170,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
