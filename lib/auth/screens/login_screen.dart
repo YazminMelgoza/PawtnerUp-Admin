@@ -1,11 +1,14 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pawtnerup_admin/config/config.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pawtnerup_admin/config/theme/color.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pawtnerup_admin/provider/auth_provider.dart';
+import 'package:pawtnerup_admin/services/shelter_service.dart';
 import 'package:pawtnerup_admin/shared/shared.dart';
 import 'package:pawtnerup_admin/utils/login_google_utils.dart';
-
+import 'package:provider/provider.dart'as pr;
 // LoginScreen
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -161,6 +164,8 @@ class _LoginFormState extends State<_LoginForm> {
                           ),
                         ),
                       );
+                      AuthenticationProvider ap = pr.Provider.of<AuthenticationProvider>(context, listen:false);
+                      ap.user = await ShelterService().getUserByEmail(username.text);
                       context.go("/Root");
                     }
                   }
