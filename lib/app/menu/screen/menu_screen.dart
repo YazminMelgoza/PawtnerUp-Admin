@@ -93,6 +93,7 @@ class __MenuViewState extends State<_MenuView> {
     super.initState();
     obtenerYActualizarUbicacion();
   }
+  List<String> sizes = ['Chiquito', 'Mediano','Grandote'];
 
   @override
   Widget build(BuildContext context) {
@@ -123,77 +124,76 @@ class __MenuViewState extends State<_MenuView> {
             children:
             [
               _statusWidget(),
-
             ],
           ),
-          FutureBuilder<List<PetModel>>(
-              future: PetService().getPetsByShelterId(authProvider.user!.uid),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                } else if (snapshot.hasError) {
-                  return Center(
-                    child: Text('Error: ${snapshot.error}'),
-                  );
-                } else if (!snapshot.hasData) {
-                  return const Center(
-                    child: Text('No hay mascotas a mostrar'),
-                  );
-                } else {
-                  final List<PetModel> pets = snapshot.data!;
-                  List<PetModel> filteredPets     = [];
-                  List<PetModel> typeFilteredPets = [];
+          StreamBuilder<List<PetModel>>(
+            stream: PetService().getPetsStreamByShelterId(authProvider.user!.uid),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else if (snapshot.hasError) {
+                return Center(
+                  child: Text('Error: ${snapshot.error}'),
+                );
+              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return const Center(
+                  child: Text('No hay mascotas a mostrar'),
+                );
+              } else {
+                final List<PetModel> pets = snapshot.data!;
+                List<PetModel> filteredPets = [];
+                List<PetModel> typeFilteredPets = [];
 
-                  if (_selectedCategory == 0) {
-                    typeFilteredPets.addAll(pets);
-                  } else if (_selectedCategory == 1) {
-                    typeFilteredPets.addAll(pets.where((pet) => pet.type == 'dog'));
-                  } else if (_selectedCategory == 2) {
-                    typeFilteredPets.addAll(pets.where((pet) => pet.type == 'cat'));
-                  }
-                  if(_selectedStatus==0)
-                  {
-                    filteredPets.addAll(typeFilteredPets.where((pet) => pet.adoptionStatus == 'available'));
-                  }else if(_selectedStatus==1)
-                  {
-                    filteredPets.addAll(typeFilteredPets.where((pet) => pet.adoptionStatus == 'adopted'));
-                  }
-                  return Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: GridView.builder(
-                        gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 20,
-                          mainAxisSpacing: 10.0,
-                          childAspectRatio: 0.7,
-                        ),
-                        itemCount: filteredPets
-                            .length, // Número de elementos en el grid
-                        itemBuilder: (context, index) {
-                          return PetItem(
-                            data: filteredPets[index].toMap(),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => PetProfilePage(
-                                    key: UniqueKey(),
-                                    pet: filteredPets[index],
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                  );
+                if (_selectedCategory == 0) {
+                  typeFilteredPets.addAll(pets);
+                } else if (_selectedCategory == 1) {
+                  typeFilteredPets.addAll(pets.where((pet) => pet.type == 'dog'));
+                } else if (_selectedCategory == 2) {
+                  typeFilteredPets.addAll(pets.where((pet) => pet.type == 'cat'));
                 }
-              }),
+
+                if (_selectedStatus == 0) {
+                  filteredPets.addAll(typeFilteredPets.where((pet) => pet.adoptionStatus == 'available'));
+                } else if (_selectedStatus == 1) {
+                  filteredPets.addAll(typeFilteredPets.where((pet) => pet.adoptionStatus == 'adopted'));
+                }
+
+                return Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: GridView.builder(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 20,
+                        mainAxisSpacing: 10.0,
+                        childAspectRatio: 0.7,
+                      ),
+                      itemCount: filteredPets.length,
+                      itemBuilder: (context, index) {
+                        return PetItem(
+                          data: filteredPets[index].toMap(),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PetProfilePage(
+                                  key: UniqueKey(),
+                                  pet: filteredPets[index],
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                );
+              }
+            },
+          ),
+
         ],
       ),
     );

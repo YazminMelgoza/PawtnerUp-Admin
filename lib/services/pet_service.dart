@@ -23,6 +23,15 @@ class PetService {
     QuerySnapshot petsSnapshot = await _firestore.collection('pets').where('shelterId', isEqualTo: shelterId).get();
     return petsSnapshot.docs.map((doc) => PetModel.fromFirebase(doc)).toList();
   }
+  Stream<List<PetModel>> getPetsStreamByShelterId(String shelterId) {
+    return _firestore
+        .collection('pets')
+        .where('shelterId', isEqualTo: shelterId)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+        .map((doc) => PetModel.fromMap(doc.data()))
+        .toList());
+  }
 
   Future<String> uploadProfilePic(File image, String uid) async {
     String fileName = 'profile_pics/$uid';
@@ -30,13 +39,16 @@ class PetService {
     return await FirebaseStorage.instance.ref(fileName).getDownloadURL();
   }
   Future<String> uploadPetPic(File image, String uid) async {
-    String fileName = 'pet_pics/$uid';
+    String fileName = 'pet_pics/'+Timestamp.now().millisecondsSinceEpoch.toString();
     await FirebaseStorage.instance.ref(fileName).putFile(image);
     return await FirebaseStorage.instance.ref(fileName).getDownloadURL();
   }
   // Método para agregar una nueva mascota
   Future<void> addPet(PetModel pet) async {
-    await _firestore.collection('pets').doc().set(pet.toMap());
+    DocumentReference docRef = await _firestore.collection('pets').add(pet.toMap());
+    String docId = docRef.id;
+    pet.id = docId;
+    await docRef.update({'id': docId});
   }
 
   // Método para actualizar la información de una mascota

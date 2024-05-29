@@ -3,10 +3,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:pawtnerup_admin/app/menu/screen/Pet/petprofile.dart';
 import 'package:pawtnerup_admin/app/menu/screen/menu_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pawtnerup_admin/auth/screens/register_data.dart';
 import 'package:pawtnerup_admin/config/config.dart';
+import 'package:pawtnerup_admin/services/chat_service.dart';
 import 'package:pawtnerup_admin/services/firebase_service.dart';
 import 'package:pawtnerup_admin/shared/shared.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -20,59 +22,16 @@ import '../../../../models/pet_model.dart';
 import '../../../../services/pet_service.dart';
 import '../../../../shared/widgets/custom_image.dart';
 
-class AddPet extends StatelessWidget {
-  const AddPet({super.key});
 
-  @override
-
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "Agregar Mascota",
-          style: TextStyle(
-            color: Colors.white, // Color del texto con opacidad del 70%
-          ),
-        ),
-        backgroundColor: Color(0xFFFF8D00),
-      ),
-        body: Stack(
-          fit: StackFit.expand,
-          children: [
-            SingleChildScrollView(
-              physics: const ClampingScrollPhysics(),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 0),
-                  Container(
-                    height: MediaQuery.of(context).size.height - 100,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.transparent,
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(100),
-                      ),
-                    ),
-                    child: const _AddPet(),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      );
-  }
-}
-
-class _AddPet extends StatefulWidget {
-  const _AddPet();
+class EditPet extends StatefulWidget {
+  final PetModel pet;
+  const EditPet({super.key, required this.pet});
 
   @override
   _AddPetState createState() => _AddPetState();
 }
 
-class _AddPetState extends State<_AddPet> {
+class _AddPetState extends State<EditPet> {
   final name = TextEditingController();
   final raza = TextEditingController();
   final edad = TextEditingController();
@@ -81,20 +40,41 @@ class _AddPetState extends State<_AddPet> {
   File? image;
   List<String> animals = ['dog', 'cat'];
   List<String> sizes = ['Chiquito', 'Mediano','Grandote'];
-  String selectedSize = 'Chiquito';
+
   List<String> BreedDogs = ['Labrador', 'Pastor Aleman', 'Chihuahua', 'Bulldog', 'Beagle'];
   List<String> SexAnimal = ['female', 'male'];
   List<String> BreedCats = ['Persa', 'Siames', 'Coon', 'Bengali', 'Britanico'];
-  List<double> Edades = [0.5, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0];
+  List<double> Edades = [0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0];
   List<String> Personalidad = [];
   List<String> Colores = [];
   List<String> PhotosURLs = [];
+  List<String> _uploadedPhotos = [];
+  String selectedSize = 'Chiquito';
   String selectedAnimal = 'dog';
   String selectedDog = 'Labrador';
   String selectedCats = 'Persa';
   double selectedEdades = 1.0;
   String selectedSex = 'male';
   User? user = FirebaseAuth.instance.currentUser;
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      Personalidad = widget.pet.features;
+      Colores = widget.pet.colors;
+      _uploadedPhotos = widget.pet.imageURLs;
+      name.text = widget.pet.name;
+      raza.text = widget.pet.breed;
+      descripcion.text = widget.pet.story!;
+      selectedEdades = widget.pet.ageInYears!.toDouble();
+      selectedAnimal = widget.pet.type.trim();
+      selectedSex = widget.pet.sex;
+      selectedSize = widget.pet.size;
+    });
+
+  }
+
 
 
 
@@ -179,7 +159,7 @@ class _AddPetState extends State<_AddPet> {
     );
     return trait;
   }
-  List<String> _uploadedPhotos = [];
+
   Future<void> _uploadPhoto() async {
     image = await pickImage(context);
     String photoUrl = await PetService().uploadPetPic(image!, user!.uid);
@@ -190,11 +170,19 @@ class _AddPetState extends State<_AddPet> {
 
 
 
+
   @override
-
   Widget build(BuildContext context) {
-
     return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          "Editar Mascota",
+          style: TextStyle(
+            color: Colors.white, // Color del texto con opacidad del 70%
+          ),
+        ),
+        backgroundColor: Color(0xFFFF8D00),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(30),
           child: SingleChildScrollView(
@@ -725,8 +713,7 @@ class _AddPetState extends State<_AddPet> {
                       Wrap(
                         spacing: 8.0,
                         alignment: WrapAlignment.start,
-                        children: Personalidad
-                            .map((trait) => Chip(
+                        children: Personalidad.map((trait) => Chip(
                           label: Text(trait),
                           backgroundColor: Color(0xFFF8F7F7),
                           labelStyle: TextStyle(
@@ -779,16 +766,15 @@ class _AddPetState extends State<_AddPet> {
                       Wrap(
                         spacing: 8.0,
                         alignment: WrapAlignment.start,
-                        children: Colores
-                            .map((trait) => Chip(
-                          label: Text(trait),
+                        children: Colores.map((color) => Chip(
+                          label: Text(color),
                           backgroundColor: Color(0xFFF8F7F7),
                           labelStyle: TextStyle(
                             fontFamily: 'outfit',
                           ),
                           onDeleted: () {
                             setState(() {
-                              Colores.remove(trait);
+                              Colores.remove(color);
                             });
                           },
                         ))
@@ -815,12 +801,12 @@ class _AddPetState extends State<_AddPet> {
                     ],
                   ),
                 ),
-                SizedBox(height: 10,),
+                SizedBox(height: 20,),
                 SizedBox(
                   width: double.infinity,
                   height: 60,
                   child: CustomFilledButton(
-                    text: 'Añadir Mascota',
+                    text: 'Guardar Cambios',
                     buttonColor: Color(0xFFFF8D00),
                     icon: MdiIcons.fromString("paw"),
 
@@ -895,7 +881,7 @@ class _AddPetState extends State<_AddPet> {
 
 
                       PetModel newPet = PetModel(
-                        id: '',
+                        id: widget.pet.id,
                         name: name.text,
                         type: selectedAnimal,
                         sex: selectedSex,
@@ -908,21 +894,29 @@ class _AddPetState extends State<_AddPet> {
                         shelterId: getuid(), // Add shelter ID if applicable
                         adoptionStatus: 'available', // Add adoption status if applicable
                         story: descripcion.text.isNotEmpty ? descripcion.text : "No hay descripción",
-                        publishedAt: Timestamp.now().millisecondsSinceEpoch, // Add publishedAt timestamp
+                        publishedAt: widget.pet.publishedAt, // Add publishedAt timestamp
                       );
                       try {
-                        await PetService().addPet(newPet);
-                        const SnackBar(
-                          content: Text(
-                            "Ha ocurrido un error inesperado. Inténtalo de nuevo más tarde.",
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.red,
+                        await PetService().updatePet(newPet);
+                        await ChatService().updatePetName(
+                            newPet.name,
+                            newPet.imageURLs.first,
+                            newPet.id
+                        );
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PetProfilePage(
+                              key: UniqueKey(),
+                              pet: newPet,
                             ),
                           ),
                         );
-                        Navigator.pop(context);
+
+
+
                       }catch (error) {
                         // Handle other non-Firebase errors
                         print(error); // Log the error for debugging
@@ -939,21 +933,18 @@ class _AddPetState extends State<_AddPet> {
                           ),
                         );
                       }
-                      // Optionally, you can show a message or navigate to a different screen after adding the pet
-
-
-                      // Clear text controllers or reset the form
+                      /*
                       name.clear();
                       descripcion.clear();
                       setState(() {
                         Personalidad.clear();
                         PhotosURLs.clear();
-                        selectedAnimal = 'Dog';
+                        selectedAnimal = 'dog';
                         selectedDog = 'Labrador';
                         selectedCats = 'Persa';
                         selectedEdades = 1.0;
-                        selectedSex = 'Male';
-                      });
+                        selectedSex = 'male';
+                      });*/
 
                     },
                   ),
